@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2024 Justice Ezenwoke Chukwuemeka
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  -->
+
+<com.jaay.beats.uiviews.Stack
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/name"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        tools:text="Name of Playlist"
+        android:textStyle="bold"
+        android:textSize="30sp"
+        />
+
+
+    <view
+        android:id="@+id/contents"
+
+        class="com.jaay.beats.reels.AllPlaylists$Playlists$PlaylistTracks$Contents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp" />
+
+</com.jaay.beats.uiviews.Stack>

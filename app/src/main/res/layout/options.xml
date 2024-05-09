@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2024 Justice Ezenwoke Chukwuemeka
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  -->
+
+<com.jaay.beats.uiviews.Slate
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <View
+        android:id="@+id/blocker"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:background="#20000000"/>
+
+    <com.jaay.beats.uiviews.Stack
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="15dp"
+
+        android:orientation="vertical"
+
+        app:radius="30dp">
+
+        <com.jaay.beats.uiviews.Slate
+            android:id="@+id/delete"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <com.jaay.beats.uiviews.Text
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+
+                android:text="@string/delete_song"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Image
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="center_vertical|end"
+
+                android:src="@drawable/delete"
+                />
+        </com.jaay.beats.uiviews.Slate>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@+id/options"
+
+
+            android:background="#40888888" />
+        <com.jaay.beats.uiviews.Slate
+            android:id="@+id/add_favourite"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <com.jaay.beats.uiviews.Text
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+
+                android:text="@string/add_to_favourites"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Image
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="center_vertical|end"
+
+                android:src="@drawable/like"
+                />
+        </com.jaay.beats.uiviews.Slate>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@+id/options"
+
+            android:background="#40888888" />
+        <com.jaay.beats.uiviews.Slate
+            android:id="@+id/set_ringtone"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <com.jaay.beats.uiviews.Text
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+
+                android:text="@string/set_as_ringtone"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Image
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="center_vertical|end"
+
+                android:src="@drawable/ringtone"
+                />
+        </com.jaay.beats.uiviews.Slate>
+
+    </com.jaay.beats.uiviews.Stack>
+
+</com.jaay.beats.uiviews.Slate>

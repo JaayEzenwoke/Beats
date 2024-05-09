@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2024 Justice Ezenwoke Chukwuemeka
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  -->
+
+<com.jaay.beats.uiviews.Stack
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:padding="10dp">
+
+    <com.jaay.beats.uiviews.Slate
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        android:layout_marginBottom="10dp">
+
+        <com.jaay.beats.uiviews.Image
+            android:id="@+id/back"
+
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+
+            android:src="@drawable/back"/>
+
+        <com.jaay.beats.uiviews.Text
+            android:id="@+id/select"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+
+            android:text="select all"/>
+
+        <com.jaay.beats.uiviews.Check
+            android:id="@+id/check"
+
+            android:layout_gravity="end"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:padding="4dp"
+
+            android:src="@drawable/check"
+
+            app:stroke="@dimen/dp2"
+            app:stroke_shade="#60888888"
+            app:shade="#60888888"
+            app:radius="10dp" />
+
+    </com.jaay.beats.uiviews.Slate>
+
+    <view
+        android:id="@+id/addlist"
+
+        class="com.jaay.beats.reels.AllPlaylists$AddSongs$Addlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/done"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:padding="7dp"
+
+        android:textAlignment="center"
+        android:text="Done"
+        android:textStyle="bold"
+        android:textSize="20sp"
+
+        app:shade="#60888888"
+        app:radius="10dp" />
+
+</com.jaay.beats.uiviews.Stack>

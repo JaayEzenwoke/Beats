@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2024 Justice Ezenwoke Chukwuemeka
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  -->
+
+<com.jaay.beats.uiviews.Stack
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <SeekBar
+        android:id="@+id/seeker"
+
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+
+
+        android:background="#FF000000"/>
+
+    <com.jaay.beats.uiviews.Stack
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:padding="5dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+
+            app:cardCornerRadius="8dp">
+
+            <com.jaay.beats.uiviews.Image
+                android:id="@+id/track_thumbnail"
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:src="@drawable/lambo"
+                android:scaleType="centerCrop"
+
+                android:adjustViewBounds="true"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp">
+
+            <com.jaay.beats.uiviews.Stack
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_toStartOf="@+id/play">
+
+                <TextView
+                    android:id="@+id/title"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:textColor="#FFCCCCCC"
+                    android:textSize="16sp"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    />
+
+                <TextView
+                    android:id="@+id/song"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:textColor="#FF888888"
+                    android:textSize="14sp"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"/>
+
+            </com.jaay.beats.uiviews.Stack>
+
+            <com.jaay.beats.uiviews.Image
+                android:id="@+id/play"
+
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+
+                android:padding="8dp"
+                android:src="@drawable/pause"
+                app:radius="100dp"
+                app:shade="#FF00FF00" />
+
+        </RelativeLayout>
+
+    </com.jaay.beats.uiviews.Stack>
+
+</com.jaay.beats.uiviews.Stack>
