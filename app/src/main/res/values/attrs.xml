@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2024 Justice Ezenwoke Chukwuemeka
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  -->
+
+<resources>
+
+    <declare-styleable name="Beats">
+        <attr name="radius" format="dimension"/>
+        <attr name="right_radius" format="dimension"/>
+        <attr name="left_radius" format="dimension"/>
+        <attr name="top_radius" format="dimension"/>
+        <attr name="bottom_radius" format="dimension"/>
+
+        <attr name="stroke_shade" format="color"/>
+        <attr name="stroke" format="dimension"/>
+        <attr name="shade" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="Frame" parent="Beats" >
+        <attr name="radius" />
+        <attr name="right_radius"/>
+        <attr name="left_radius"/>
+        <attr name="top_radius"/>
+        <attr name="bottom_radius"/>
+
+        <attr name="stroke_shade"/>
+        <attr name="stroke"/>
+        <attr name="shade"/>
+    </declare-styleable>
+
+    <declare-styleable name="Picture" parent="Beats" >
+        <attr name="radius" />
+        <attr name="right_radius"/>
+        <attr name="left_radius"/>
+        <attr name="top_radius"/>
+        <attr name="bottom_radius"/>
+
+        <attr name="stroke_shade"/>
+        <attr name="stroke"/>
+        <attr name="shade"/>
+
+        <attr name="src" format="reference"/>
+
+    </declare-styleable>
+
+    <declare-styleable name="Linear" parent="Beats" >
+        <attr name="radius" />
+        <attr name="right_radius"/>
+        <attr name="left_radius"/>
+        <attr name="top_radius"/>
+        <attr name="bottom_radius"/>
+        <attr name="shade"/>
+    </declare-styleable>
+
+    <declare-styleable name="Dots" parent="Beats" >
+        <attr name="radius" />
+        <attr name="right_radius"/>
+        <attr name="left_radius"/>
+        <attr name="top_radius"/>
+        <attr name="bottom_radius"/>
+
+        <attr name="stroke_shade"/>
+        <attr name="stroke"/>
+        <attr name="shade"/>
+
+        <attr name="diameter" format="dimension"/>
+        <attr name="spacing" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="Edit" parent="Beats" >
+        <attr name="radius" />
+        <attr name="right_radius"/>
+        <attr name="left_radius"/>
+        <attr name="top_radius"/>
+        <attr name="bottom_radius"/>
+
+        <attr name="stroke_shade"/>
+        <attr name="stroke"/>
+        <attr name="shade"/>
+
+    </declare-styleable>
+
+</resources>
