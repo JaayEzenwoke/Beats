@@ -14,9 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 
 import com.jaay.beats.R;
+import com.jaay.beats.important.Animator;
 import com.jaay.beats.tools.Utils;
 import com.jaay.beats.uiviews.Slate;
 
@@ -34,18 +34,19 @@ public class TestActivity extends AppCompatActivity {
                 animator = new Animator( 0, 200, 800) {
                     @Override
                     public void onStart() {
-
+                        tester.setBackgroundColor(0xFF00FF00);
                     }
 
                     @Override
                     public void onUpdate(float animation_value) {
                         Utils.debug("animation value: " + animation_value);
                         tester.setTranslationX(animation_value);
+                        tester.setBackgroundColor(0xFFFF0000);
                     }
 
                     @Override
                     public void onEnd() {
-
+                        tester.setBackgroundColor(0xFF00FFFF);
                     }
                 };
             }
