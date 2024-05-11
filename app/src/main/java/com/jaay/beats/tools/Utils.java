@@ -13,6 +13,7 @@ package com.jaay.beats.tools;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.jaay.beats.R;
 import com.jaay.beats.design.Background;
@@ -42,5 +43,9 @@ public class Utils {
         }finally {
             stylable.recycle();
         }
+    }
+
+    public static void debug(Object debug) {
+        Log.d("Beats: ", " "  + debug);
     }
 }

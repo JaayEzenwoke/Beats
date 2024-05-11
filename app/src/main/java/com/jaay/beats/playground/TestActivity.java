@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.jaay.beats.R;
+import com.jaay.beats.tools.Utils;
 import com.jaay.beats.uiviews.Slate;
 
 public class TestActivity extends AppCompatActivity {
@@ -27,24 +28,27 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         tester = findViewById(R.id.tester);
-
-        Animator animator = new Animator( 0, 200, 4000) {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onUpdate(float animation_value) {
-                tester.setTranslationX(animation_value);
-            }
-
-            @Override
-            public void onEnd() {
-
-            }
-        };
         tester.setOnClickListener(new View.OnClickListener() {
+            Animator animator;
+            {
+                animator = new Animator( 0, 200, 800) {
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onUpdate(float animation_value) {
+                        Utils.debug("animation value: " + animation_value);
+                        tester.setTranslationX(animation_value);
+                    }
+
+                    @Override
+                    public void onEnd() {
+
+                    }
+                };
+            }
             @Override
             public void onClick(View view) {
                 animator.start();

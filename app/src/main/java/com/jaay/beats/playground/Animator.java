@@ -15,12 +15,10 @@ public abstract class Animator implements Choreographer.FrameCallback {
     private float animation_value;
     private float fraction;
 
-
     public Animator(float start_value, float end_value, long duration) {
         this.start_value = start_value;
         this.end_value = end_value;
         this.duration = duration;
-        this.start_time = System.currentTimeMillis();
     }
 
     float current_time;
@@ -28,26 +26,28 @@ public abstract class Animator implements Choreographer.FrameCallback {
     public void doFrame(long nano_time) {
         current_time = (nano_time - start_time) / 1000000F;
         animation_value = calculate(current_time);
+        fraction = current_time / duration;
         if(current_time < duration) {
             onUpdate(animation_value);
+            Choreographer.getInstance().postFrameCallback(this);
         }
         if(current_time >= duration) {
             onEnd();
         }
     }
-
     public float calculate(float current_time) {
         return (end_value - start_value) * (current_time / duration);
     }
 
+    public void start() {
+        start_time = System.nanoTime();
+        Choreographer.getInstance().postFrameCallback(this);
+    }
+
+
     public abstract void onStart();
     public abstract void onUpdate(float animation_value);
     public abstract void onEnd();
-
-    public void start() {
-        start_time = SystemClock.elapsedRealtimeNanos();
-        Choreographer.getInstance().postFrameCallback(this);
-    }
 
 
 }
