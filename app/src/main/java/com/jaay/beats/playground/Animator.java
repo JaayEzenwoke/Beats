@@ -13,6 +13,8 @@ public abstract class Animator implements Choreographer.FrameCallback {
     private long duration;
     private long start_time;
     private float animation_value;
+    private float fraction;
+
 
     public Animator(float start_value, float end_value, long duration) {
         this.start_value = start_value;
