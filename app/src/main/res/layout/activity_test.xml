@@ -22,10 +22,21 @@
 
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_gravity="center_vertical"
 
         app:radius="25dp"
         app:shade="@color/black"/>
+
+    <com.jaay.beats.uiviews.Seekbar
+        android:id="@+id/test_seekbar"
+
+        android:layout_width="200dp"
+        android:layout_height="20dp"
+
+        android:layout_gravity="center"
+
+        app:shade="@color/black"
+
+        />
 
 
 </com.jaay.beats.uiviews.Slate>

@@ -8,8 +8,7 @@ import android.view.animation.Interpolator;
 
 public abstract class Animator implements Choreographer.FrameCallback {
 
-    private float animation_value;
-    private float start_value;
+    private  float start_value;
     private long start_time;
     private float end_value;
     private float fraction;
@@ -22,10 +21,11 @@ public abstract class Animator implements Choreographer.FrameCallback {
     }
 
     float current_time;
+    
     @Override
     public void doFrame(long nano_time) {
         current_time = (nano_time - start_time) / 1_000_000F;
-        animation_value = calculate(current_time);
+        float animation_value = calculate(current_time);
         fraction = current_time / duration;
         if(fraction == 0) {
             onStart();
