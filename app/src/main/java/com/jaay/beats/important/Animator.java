@@ -9,6 +9,7 @@ import android.view.animation.Interpolator;
 public abstract class Animator implements Choreographer.FrameCallback {
 
     private  float start_value;
+    
     private long start_time;
     private float end_value;
     private float fraction;

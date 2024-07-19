@@ -17,6 +17,10 @@ import android.util.Log;
 
 import com.jaay.beats.R;
 import com.jaay.beats.design.Background;
+import com.jaay.beats.types.Audio;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class Utils {
 
@@ -48,4 +52,56 @@ public class Utils {
     public static void debug(Object debug) {
         Log.d("Beats: ", " "  + debug);
     }
+
+    public static String getTrimmed(String source) {
+        Utils.debug("path: " + source);
+        int length = source.length() - 1;
+        StringBuilder builder = new StringBuilder();
+        for (int i = length; i > 0; i--) {
+            char character = source.charAt(i);
+            if(character == '.') {
+                length += 1;
+                for (int j = i; j < length; j++) {
+                    builder.append(source.charAt(j));
+                }
+                source = source.replace(builder.toString(), "");
+                break;
+            }
+        }
+        return source;
+    }
+
+    public static String getUniqueFilename(Audio audio, ArrayList<Audio> tracks) {
+        int i = 1;
+        Utils.debug("title: " + audio.getPath() + " | extension " + getExtension(audio.getPath())  + " | trimmed " + getTrimmed(audio.getPath()));
+        String name = "";
+        String extension = getExtension(audio.getPath());
+
+        for (int j = 0; j < tracks.size(); j++) {
+            name = audio.getTitle() + "(" + i + ")." + extension;
+            if (tracks.get(i).getTitle().equals(name)) {
+                i++;
+            }else {
+                break;
+            }
+        }
+        return name;
+    }
+
+    public static String getTrimmed2(String source) {
+        int lastDotIndex = source.lastIndexOf(".");
+        if (lastDotIndex != -1) {
+            source = source.substring(0, lastDotIndex);
+        }
+        return source;
+    }
+
+    public static String getExtension(String filename) {
+        int lastIndexOf = filename.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return ""; // no extension found
+        }
+        return filename.substring(lastIndexOf + 1);
+    }
+
 }

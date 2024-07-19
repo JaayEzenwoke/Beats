@@ -23,6 +23,8 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
 
+        android:visibility="gone"
+
         app:radius="25dp"
         app:shade="@color/black"/>
 
@@ -37,6 +39,74 @@
         app:shade="@color/black"
 
         />
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/play"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_margin="20dp"
+        android:padding="10sp"
+
+        android:text="play"
+        android:textColor="#FFFFFFFF"
+
+        app:radius="25dp"
+        app:shade="@color/black"/>
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/pause"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="end"
+        android:layout_margin="20dp"
+        android:padding="10sp"
+
+        android:text="pause"
+        android:textSize="20sp"
+        android:textColor="#FFFFFFFF"
+
+        app:radius="25dp"
+        app:shade="@color/black"/>
+
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/cut"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:padding="10sp"
+
+        android:text="cut"
+        android:textColor="#FFFFFFFF"
+
+        app:radius="25dp"
+        app:shade="@color/black"/>
+
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/equalizer"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:padding="10sp"
+
+        android:text="equalizer"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFFFF"
+
+        app:radius="25dp"
+        app:shade="@color/black"/>
 
 
 </com.jaay.beats.uiviews.Slate>
