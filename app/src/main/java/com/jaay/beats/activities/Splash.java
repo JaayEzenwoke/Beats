@@ -27,7 +27,7 @@ import com.jaay.beats.types.Playlist;
 import java.io.File;
 import java.util.ArrayList;
 
-public class Splash extends AppCompatActivity {
+public class Splash extends Beats {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

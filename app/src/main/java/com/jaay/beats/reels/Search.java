@@ -37,7 +37,6 @@ import java.util.Comparator;
 
 public class Search extends Slate {
 
-
     public static class SearchList extends RecyclerView {
 
         public static class Adapter extends RecyclerView.Adapter<Adapter.Holder> {

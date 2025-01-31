@@ -16,6 +16,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -27,8 +28,11 @@ import com.jaay.beats.tools.Utils;
 
 public class Seekbar extends View {
 
-    private Handler handler;
+    private MediaPlayer player;
+    public Handler handler;
+    public Runnable seeker;
     private Paint paint;
+
     private float additions;
 
     public Seekbar(Context context) {
@@ -64,19 +68,24 @@ public class Seekbar extends View {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
                 float px = event.getX();
+
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
                         additions = px;
                         invalidate();
+                        
                     }break;
                     case MotionEvent.ACTION_MOVE: {
                         additions = px;
                         int time;
                         invalidate();
                     }break;
+                    case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_UP: {
                         additions = px;
-                        int current_time = 0;
+                        int duration = player.getDuration() / 1000;
+                        int position = (int) (additions * duration);
+                        player.seekTo(position);
                         invalidate();
                     }break;
                 }
@@ -105,7 +114,9 @@ public class Seekbar extends View {
 
     public void setAdditions(int time) {
         float unit = (float) getWidth() / time;
-        handler.post(new Runnable() {
+
+        seeker = new Runnable() {
+
             @Override
             public void run() {
                 if (additions < getWidth()) {
@@ -114,12 +125,30 @@ public class Seekbar extends View {
                     Utils.debug("additions: " + additions + " width: " + getWidth());
                     handler.postDelayed(this, 1000);
                 }else {
-                    additions = getWidth();
+                    additions = 0;
                     Utils.debug("XX additions: " + additions + " width: " + getWidth());
                     invalidate();
                 }
 
             }
-        });
+        };
+
+        handler.post(seeker);
+    }
+
+    public void pause(float current_position) {
+        handler.removeCallbacks(seeker);
+    }
+
+    public void seekTo(int position) {
+
+    }
+
+    public MediaPlayer getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(MediaPlayer player) {
+        this.player = player;
     }
 }

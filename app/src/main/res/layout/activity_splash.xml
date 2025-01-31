@@ -9,12 +9,32 @@
   ~        http://www.apache.org/licenses/LICENSE-2.0
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+    android:background="@color/beat_color"
+
     tools:context=".activities.Splash">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.jaay.beats.uiviews.Image
+        android:id="@+id/logo"
+
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+
+        android:layout_gravity="center"
+
+        android:src="@drawable/logo"
+        android:scaleType="centerCrop"
+
+        android:adjustViewBounds="true"
+
+        app:radius="10dp"/>
+
+</FrameLayout>

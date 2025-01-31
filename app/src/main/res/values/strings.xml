@@ -13,4 +13,6 @@
     <string name="set_as_ringtone">Set as Ringtone</string>
     <string name="add_to_favourites">Add to favourites</string>
     <string name="delete_song">delete song</string>
+    <string name="now_playing">now playing</string>
+    <string name="all_songs">All Songs</string>
 </resources>

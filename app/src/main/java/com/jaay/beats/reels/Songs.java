@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jaay.beats.R;
+import com.jaay.beats.tools.Utils;
 import com.jaay.beats.types.Audio;
 import com.jaay.beats.types.Playlist;
 
@@ -114,7 +115,7 @@ public class Songs extends RecyclerView {
             return tracks.get(position);
         }
 
-        void setClickListener(Listener listener) {
+        public void setClickListener(Listener listener) {
             this.listener = listener;
         }
     }
@@ -128,6 +129,7 @@ public class Songs extends RecyclerView {
     private Audio next;
 
     private int current_position;
+    private int previous_position;
     private int mode;
 
     public Songs(@NonNull Context context) {
@@ -150,20 +152,49 @@ public class Songs extends RecyclerView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        int beat_color = getResources().getColor(R.color.beat_color);
+        int title_color = getResources().getColor(R.color.grey2);
+        int song_color = getResources().getColor(R.color.grey1);
+
         adapter.setClickListener(new Adapter.Listener() {
 
             @Override
             public void onClick(View view, int position) {
+                if(position < 0) return;
+
                 setCurrentPosition(position);
                 Audio audio = adapter.getItem(position);
-                getNow_playing().setVisibility(VISIBLE);
-                playAudio(audio);
+                getPlaying().setVisibility(VISIBLE);
                 getNow_playing().initialize();
+                playAudio(audio);
                 setPrevious(adapter.getItem(position - 1));
                 setCurrent(audio);
-                setNext(adapter.getItem(position + 1));
+                if (adapter.tracks.size() > position) {
+                    setNext(adapter.getItem(position + 1));
+                }
+
                 getNow_playing().setImage(getContext(), getCurrent().getPath());
-                now_playing.setTitle(audio.getTitle(), audio.getArtist());
+                getNow_playing().setTitle(audio.getTitle(), audio.getArtist());
+
+                getPlaying().initialize();
+                Utils.setImage(getContext(), getCurrent().getPath(), getPlaying().thumbnail);
+
+                TextView title = view.findViewById(R.id.title);
+                TextView song = view.findViewById(R.id.song);
+
+                title.setTextColor(beat_color);
+                song.setTextColor(beat_color);
+
+                if (previous_position > -1 && previous_position < adapter.tracks.size()) {
+                    Adapter.Holder previous = ((Adapter.Holder) findViewHolderForAdapterPosition(getPreviousPosition()));
+                    if(previous != null) {
+                        previous.title.setTextColor(title_color);
+                        previous.song.setTextColor(song_color);
+                    };
+
+                }
+
+                setPreviousPosition(current_position);
             }
         });
     }
@@ -176,6 +207,7 @@ public class Songs extends RecyclerView {
     }
 
     private Playing.NowPlaying now_playing;
+    private Playing playing;
 
     @SuppressLint("Range")
     private ArrayList<Audio> getTracks(Context context) {
@@ -338,6 +370,14 @@ public class Songs extends RecyclerView {
         this.now_playing = now_playing;
     }
 
+    public void setPlaying(Playing playing) {
+        this.playing = playing;
+    }
+
+    public Playing getPlaying() {
+        return playing;
+    }
+
     public void setPrevious(Audio previous) {
         this.previous = previous;
     }
@@ -376,6 +416,14 @@ public class Songs extends RecyclerView {
 
     public int getCurrentPosition() {
         return current_position;
+    }
+
+    public void setPreviousPosition(int previous_position) {
+        this.previous_position = previous_position;
+    }
+
+    public int getPreviousPosition() {
+        return previous_position;
     }
 
     public void setMode(int mode) {

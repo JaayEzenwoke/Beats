@@ -12,14 +12,21 @@ package com.jaay.beats.tools;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.jaay.beats.R;
 import com.jaay.beats.design.Background;
 import com.jaay.beats.types.Audio;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Utils {
@@ -104,4 +111,41 @@ public class Utils {
         return filename.substring(lastIndexOf + 1);
     }
 
+    public static int mix(int left, int right, float ratio) {
+        ratio = Math.max(0, Math.min(1, ratio)); // Clamp ratio to 0-1 range
+
+        int alpha1 = Color.alpha(left);
+        int red1 = Color.red(left);
+        int green1 = Color.green(left);
+        int blue1 = Color.blue(left);
+
+        int alpha2 = Color.alpha(right);
+        int red2 = Color.red(right);
+        int green2 = Color.green(right);
+        int blue2 = Color.blue(right);
+
+        int alpha = (int) (alpha1 * ratio + alpha2 * (1 - ratio));
+        int red = (int) (red1 * ratio + red2 * (1 - ratio));
+        int green = (int) (green1 * ratio + green2 * (1 - ratio));
+        int blue = (int) (blue1 * ratio + blue2 * (1 - ratio));
+
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    public static void setImage (Context context, String path, ImageView thumbnail) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(context, Uri.parse(path));
+
+        byte[] artwork = retriever.getEmbeddedPicture();
+        if (artwork != null) {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(artwork, 0, artwork.length);
+            thumbnail.setImageBitmap(bitmap);
+        }
+
+        try {
+            retriever.release();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
 }

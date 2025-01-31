@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -23,6 +25,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.jaay.beats.R;
 import com.jaay.beats.concurrency.Runner;
@@ -31,14 +34,16 @@ import com.jaay.beats.reels.Favourites;
 import com.jaay.beats.reels.Playing;
 import com.jaay.beats.reels.Search;
 import com.jaay.beats.reels.Songs;
+import com.jaay.beats.tools.Utils;
+import com.jaay.beats.uiviews.Image;
 import com.jaay.beats.uiviews.Stack;
 import com.jaay.beats.uiviews.Options;
+import com.jaay.beats.uiviews.Text;
 
 import java.util.ArrayList;
 
 public class Base extends Beats {
 
-    private Playing.NowPlaying now_playing;
     private Stack favourites_button;
     private Stack playlists_button;
     private AllPlaylists playlists;
@@ -53,13 +58,19 @@ public class Base extends Beats {
     private Songs songs;
     private Stack home;
 
+    private Image favorites_icon;
+    private Image playlists_icon;
+    private Image search_icon;
+    private Image home_icon;
+
+    private TextView favorites_text;
+    private TextView playlists_text;
+    private TextView search_text;
+    private TextView home_text;
+
     int margin;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_base);
-        super.onCreate(savedInstanceState);
-    }
+
 
     @Override
     protected void getInitialization() {
@@ -82,7 +93,6 @@ public class Base extends Beats {
         playlists_button  = findViewById(R.id.playlists_button);
         content           = findViewById(android.R.id.content);
         search_button     = findViewById(R.id.search_button);
-        now_playing       = findViewById(R.id.now_playing);
         favourites        = findViewById(R.id.favourites);
         playlists         = findViewById(R.id.playlists);
         searches          = findViewById(R.id.searches);
@@ -92,6 +102,22 @@ public class Base extends Beats {
         home              = findViewById(R.id.home);
         tab               = findViewById(R.id.tab);
 
+        favorites_icon    = findViewById(R.id.favorites_icon);
+        playlists_icon    = findViewById(R.id.playlists_icon);
+        search_icon       = findViewById(R.id.search_icon);
+        home_icon         = findViewById(R.id.home_icon);
+
+        favorites_text    = findViewById(R.id.favorites_text);
+        playlists_text    = findViewById(R.id.playlists_text);
+        search_text       = findViewById(R.id.search_text);
+        home_text         = findViewById(R.id.home_text);
+
+    }
+
+
+    @Override
+    protected void getAdjustments() {
+        super.getAdjustments();
     }
 
     @Override
@@ -101,8 +127,10 @@ public class Base extends Beats {
         MediaPlayer player = new MediaPlayer();
 
         songs.setActivity(this);
-        now_playing.setPlayer(player);
-        songs.setNow_playing(now_playing);
+        playing.dropper.setPlayer(player);
+        playing.setPlayer(player);
+        songs.setNow_playing(playing.dropper);
+        songs.setPlaying(playing);
         songs.initialize(this);
         searches.initialize(Base.this, songs.tracks);
         playlists.getAdd_songs().addlist.setTracks(songs.tracks);
@@ -140,6 +168,9 @@ public class Base extends Beats {
                     }
                 });
 
+        int grey = getResources().getColor(R.color.grey1);
+        int app_color = getResources().getColor(R.color.beat_color);
+
         home.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -148,10 +179,24 @@ public class Base extends Beats {
                 favourites.setVisibility(View.GONE);
                 playlists.setVisibility(View.GONE);
                 searches.setVisibility(View.GONE);
+                playing.setTop(playing.getOffset());
+
+                favorites_text.setTextColor(grey);
+                playlists_text.setTextColor(grey);
+                search_text.setTextColor(grey);
+                home_text.setTextColor(app_color);
+
+                favorites_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                playlists_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                search_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                home_icon.setColorFilter(new PorterDuffColorFilter(app_color, PorterDuff.Mode.SRC_IN));
+
+                Utils.debug("home_button: ");
 
             }
 
         });
+
         search_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -160,9 +205,23 @@ public class Base extends Beats {
                 favourites.setVisibility(View.GONE);
                 playlists.setVisibility(View.GONE);
                 songs.setVisibility(View.GONE);
+                playing.setTop(playing.getOffset());
+
+                favorites_text.setTextColor(grey);
+                playlists_text.setTextColor(grey);
+                home_text.setTextColor(grey);
+                search_text.setTextColor(app_color);
+
+                favorites_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                playlists_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                home_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                search_icon.setColorFilter(new PorterDuffColorFilter(app_color, PorterDuff.Mode.SRC_IN));
+
+                Utils.debug("search_button: ");
             }
 
         });
+
         favourites_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -171,10 +230,24 @@ public class Base extends Beats {
                 playlists.setVisibility(View.GONE);
                 searches.setVisibility(View.GONE);
                 songs.setVisibility(View.GONE);
+                playing.setTop(playing.getOffset());
+                Utils.debug("favourites_button: ");
+
+                playlists_text.setTextColor(grey);
+                search_text.setTextColor(grey);
+                home_text.setTextColor(grey);
+                favorites_text.setTextColor(app_color);
+
+                playlists_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                search_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                home_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                favorites_icon.setColorFilter(new PorterDuffColorFilter(app_color, PorterDuff.Mode.SRC_IN));
+
 
             }
 
         });
+
         playlists_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -183,20 +256,40 @@ public class Base extends Beats {
                 favourites.setVisibility(View.GONE);
                 searches.setVisibility(View.GONE);
                 songs.setVisibility(View.GONE);
+                playing.setTop(playing.getOffset());
+                Utils.debug("playlists_button: ");
+
+                favorites_text.setTextColor(grey);
+                search_text.setTextColor(grey);
+                home_text.setTextColor(grey);
+                playlists_text.setTextColor(app_color);
+
+                favorites_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                search_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                home_icon.setColorFilter(new PorterDuffColorFilter(grey, PorterDuff.Mode.SRC_IN));
+                playlists_icon.setColorFilter(new PorterDuffColorFilter(app_color, PorterDuff.Mode.SRC_IN));
+
             }
 
         });
+    }
 
-        now_playing.setOnClickListener(new View.OnClickListener() {
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_base);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        tab.post(new Runnable() {
             @Override
-            public void onClick(View view) {
-                playing.setVisibility(View.VISIBLE);
-                playlists.setVisibility(View.GONE);
-                favourites.setVisibility(View.GONE);
-                searches.setVisibility(View.GONE);
-                songs.setVisibility(View.GONE);
-                now_playing.setVisibility(View.GONE);
+            public void run() {
+                Utils.debug("tab.post: ");
+                playing.post(tab.getHeight(), tab);
             }
         });
     }

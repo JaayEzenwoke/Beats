@@ -23,6 +23,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -225,6 +227,9 @@ public class Beat {
                 decodeAndPlay(path);
             }
         });
+
+        Map<String, String> testMap = new HashMap<>();
+        testMap.put("test", "test");
     }
 
     // Decode and play audio simultaneously

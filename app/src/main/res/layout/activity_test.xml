@@ -13,8 +13,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".playground.TestActivity">
 
     <com.jaay.beats.uiviews.Slate
@@ -36,12 +38,12 @@
 
         android:layout_gravity="center"
 
-        app:shade="@color/black"
+        android:visibility="gone"
 
-        />
+        app:shade="@color/black" />
 
     <com.jaay.beats.uiviews.Text
-        android:id="@+id/play"
+        android:id="@+id/test_play"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,6 +53,7 @@
 
         android:text="play"
         android:textColor="#FFFFFFFF"
+        android:visibility="gone"
 
         app:radius="25dp"
         app:shade="@color/black"/>
@@ -68,6 +71,7 @@
         android:text="pause"
         android:textSize="20sp"
         android:textColor="#FFFFFFFF"
+        android:visibility="gone"
 
         app:radius="25dp"
         app:shade="@color/black"/>
@@ -85,10 +89,10 @@
 
         android:text="cut"
         android:textColor="#FFFFFFFF"
+        android:visibility="gone"
 
         app:radius="25dp"
         app:shade="@color/black"/>
-
 
     <com.jaay.beats.uiviews.Text
         android:id="@+id/equalizer"
@@ -104,9 +108,319 @@
         android:textSize="20sp"
         android:textAlignment="center"
         android:textColor="#FFFFFFFF"
+        android:visibility="gone"
 
         app:radius="25dp"
         app:shade="@color/black"/>
 
+    <com.jaay.beats.uiviews.Slate
+
+        android:id="@+id/drag_test"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:orientation="vertical"
+
+        android:visibility="visible"
+
+        app:shade="#FFA06327">
+
+        <com.jaay.beats.uiviews.Stack
+            android:id="@+id/play_box"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1"
+
+            android:orientation="vertical"
+            android:padding="20dp"
+
+            app:shade="#FFA06327">
+
+            <com.jaay.beats.uiviews.Slate
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.10"
+
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <com.jaay.beats.uiviews.Image
+                    android:id="@+id/back"
+
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+
+                    android:rotation="270"
+                    android:src="@drawable/back"/>
+
+                <com.jaay.beats.uiviews.Text
+                    android:id="@+id/now_playing"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="7dp"
+
+                    android:text="@string/now_playing"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+                <com.jaay.beats.uiviews.Image
+                    android:id="@+id/like"
+
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+
+                    android:layout_gravity="end"
+
+                    android:src="@drawable/heart"/>
+
+            </com.jaay.beats.uiviews.Slate>
+
+            <com.jaay.beats.uiviews.Image
+                android:id="@+id/thumbnail"
+
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.869"
+
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+
+                android:src="@drawable/lambo"
+
+                app:radius="32dp" />
+
+            <com.jaay.beats.uiviews.Text
+                android:id="@+id/title"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+
+                android:textStyle="bold"
+                android:text="title"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Text
+                android:id="@+id/artist"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+
+                android:text="Artist"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Seekbar
+                android:id="@+id/seek_bar"
+
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+
+                app:shade="#40000000" />
+
+            <com.jaay.beats.uiviews.Slate
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.jaay.beats.uiviews.Text
+                    android:id="@+id/start_time"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="0.00"
+                    android:textColor="@color/black"/>
+
+                <com.jaay.beats.uiviews.Text
+                    android:id="@+id/end_time"
+                    android:layout_gravity="end"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="4.08"
+                    android:textColor="@color/black"/>
+
+            </com.jaay.beats.uiviews.Slate>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal">
+
+                <com.jaay.beats.uiviews.Image
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+
+                    android:src="@drawable/playlist"
+                    />
+
+                <com.jaay.beats.uiviews.Image
+                    android:id="@+id/previous"
+
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+
+                    android:layout_marginLeft="10dp"
+                    android:layout_gravity="center_vertical"
+
+                    android:src="@drawable/fast_rewind"/>
+
+                <com.jaay.beats.uiviews.Image
+                    android:id="@+id/play"
+
+                    android:layout_width="50dp"
+                    android:layout_height="60dp"
+
+                    android:layout_marginLeft="10dp"
+
+                    android:src="@drawable/pause" />
+
+                <com.jaay.beats.uiviews.Image
+                    android:id="@+id/next"
+
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+
+                    android:src="@drawable/fast_forward"/>
+
+                <com.jaay.beats.uiviews.Image
+                    android:id="@+id/shuffle"
+
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+
+                    android:src="@drawable/shuffle" />
+
+            </LinearLayout>
+
+        </com.jaay.beats.uiviews.Stack>
+
+        <com.jaay.beats.uiviews.Stack
+            android:id="@+id/smaller"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            app:shade="#FF000000"
+
+            tools:visibility="gone">
+
+            <com.jaay.beats.uiviews.Seekbar
+                android:id="@+id/seeker"
+
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+
+                app:shade="#00000000"/>
+
+            <com.jaay.beats.uiviews.Stack
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:padding="5dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+
+                    android:layout_marginStart="8dp"
+
+                    app:cardCornerRadius="8dp">
+
+                    <com.jaay.beats.uiviews.Image
+                        android:id="@+id/track_thumbnail"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+
+                        android:src="@drawable/lambo"
+                        android:scaleType="centerCrop"
+
+                        android:adjustViewBounds="true"/>
+
+                </androidx.cardview.widget.CardView>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp">
+
+                    <com.jaay.beats.uiviews.Stack
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_toStartOf="@+id/now_play">
+
+                        <TextView
+                            android:id="@+id/now_title"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:textColor="#FFCCCCCC"
+                            android:textSize="16sp"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            />
+
+                        <TextView
+                            android:id="@+id/song"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:textColor="#FF888888"
+                            android:textSize="14sp"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:ellipsize="end"/>
+
+                    </com.jaay.beats.uiviews.Stack>
+
+                    <com.jaay.beats.uiviews.Image
+                        android:id="@+id/now_play"
+
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+
+                        android:padding="8dp"
+                        android:src="@drawable/pause"
+                        app:radius="100dp"
+                        app:shade="#FF00FF00" />
+
+                </RelativeLayout>
+
+            </com.jaay.beats.uiviews.Stack>
+
+        </com.jaay.beats.uiviews.Stack>
+
+    </com.jaay.beats.uiviews.Slate>
 
 </com.jaay.beats.uiviews.Slate>

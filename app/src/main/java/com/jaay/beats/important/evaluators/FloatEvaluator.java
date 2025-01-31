@@ -1,17 +1,15 @@
 package com.jaay.beats.important.evaluators;
 
-public class FloatEvaluator<Float> extends Evaluator <Float>{
+import com.jaay.beats.tools.Utils;
 
-    public FloatEvaluator() {
 
+public class FloatEvaluator extends Evaluator<Float> {
+
+    public FloatEvaluator(Float... values) {
+        this.values = values;
     }
-
-    public FloatEvaluator(float[] evaluator) {
-
-    }
-
     @Override
-    public Float evaluate(float fraction, Float start_value, Float end_value) {
-        return super.evaluate(fraction, start_value, end_value);
+    public Float evaluate(float time, Float start_value, Float end_value) {
+        return (end_value -  start_value) * time + start_value;
     }
 }

@@ -16,95 +16,87 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <SeekBar
+    <com.jaay.beats.uiviews.Seekbar
         android:id="@+id/seeker"
 
         android:layout_width="match_parent"
         android:layout_height="2dp"
 
+        app:shade="#00000000"/>
 
-        android:background="#FF000000"/>
-
-    <com.jaay.beats.uiviews.Stack
+    <com.jaay.beats.uiviews.Slate
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         android:padding="5dp">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+        <com.jaay.beats.uiviews.Image
+            android:id="@+id/track_thumbnail"
 
-            app:cardCornerRadius="8dp">
+            android:layout_width="35dp"
+            android:layout_height="35dp"
 
-            <com.jaay.beats.uiviews.Image
-                android:id="@+id/track_thumbnail"
+            android:layout_marginStart="4dp"
 
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+            android:src="@drawable/lambo"
+            android:scaleType="centerCrop"
 
-                android:src="@drawable/lambo"
-                android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            app:radius="8dp" />
 
-                android:adjustViewBounds="true"/>
+        <com.jaay.beats.uiviews.Stack
+            android:id="@+id/artist_title"
 
-        </androidx.cardview.widget.CardView>
-
-        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp">
 
-            <com.jaay.beats.uiviews.Stack
-                android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="48dp"
+            android:layout_marginRight="48dp">
+
+            <TextView
+                android:id="@+id/title"
+
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_toStartOf="@+id/play">
 
-                <TextView
-                    android:id="@+id/title"
+                android:textColor="#FFCCCCCC"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/song"
 
-                    android:textColor="#FFCCCCCC"
-                    android:textSize="16sp"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-                <TextView
-                    android:id="@+id/song"
+                android:textColor="#FF888888"
+                android:textSize="10sp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end"/>
 
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+        </com.jaay.beats.uiviews.Stack>
 
-                    android:textColor="#FF888888"
-                    android:textSize="14sp"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:ellipsize="end"/>
+        <com.jaay.beats.uiviews.Image
+            android:id="@+id/play"
 
-            </com.jaay.beats.uiviews.Stack>
+            android:layout_width="35dp"
+            android:layout_height="35dp"
 
-            <com.jaay.beats.uiviews.Image
-                android:id="@+id/play"
+            android:layout_marginEnd="4dp"
+            android:layout_gravity="end"
+            android:padding="8dp"
 
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
+            android:src="@drawable/pause"
 
-                android:padding="8dp"
-                android:src="@drawable/pause"
-                app:radius="100dp"
-                app:shade="#FF00FF00" />
+            app:radius="100dp"
+            app:shade="@color/beat_color" />
 
-        </RelativeLayout>
-
-    </com.jaay.beats.uiviews.Stack>
+    </com.jaay.beats.uiviews.Slate>
 
 </com.jaay.beats.uiviews.Stack>

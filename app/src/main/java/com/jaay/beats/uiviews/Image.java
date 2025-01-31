@@ -36,20 +36,12 @@ public class Image extends ImageView {
         super(context, attributes);
         background = getTile(context, attributes);
         setBackground(getTile(context, attributes).getWalllpaper());
-        initialize(context, attributes);
+        setClipToOutline(true);
     }
 
     public Image(Context context, @Nullable AttributeSet attributes, int style) {
         super(context, attributes, style);
         setBackground(getTile(context, attributes).getWalllpaper());
-        initialize(context, attributes);
-    }
-
-    public void initialize(Context context, AttributeSet attributes) {
-
-    }
-
-    public void setProperties() {
         setClipToOutline(true);
     }
 

@@ -12,7 +12,12 @@ package com.jaay.beats.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
+
+import com.jaay.beats.R;
 
 public class Beats extends AppCompatActivity {
 
@@ -20,6 +25,13 @@ public class Beats extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_beats);
+
+        Window window = getWindow();
+        int beat_color = getResources().getColor(R.color.beat_color);
+        window.setStatusBarColor(beat_color);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setNavigationBarColor(beat_color);
 
         getInitialization();
         getIdentification();
