@@ -34,9 +34,6 @@ public class Splash extends Beats {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        Debbugger debbugger = new Debbugger();
-        debbugger.start();
-
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Runner runner = new Runner();
         runner.setData(this);
@@ -45,7 +42,7 @@ public class Splash extends Beats {
             @Override
             public void run() {
                 Intent intent;
-                intent = new Intent(Splash.this, TestActivity.class);
+                intent = new Intent(Splash.this, Base.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("runner", runner);
                 startActivity(intent);

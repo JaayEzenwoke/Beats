@@ -86,4 +86,20 @@
 
     </declare-styleable>
 
+
+    <declare-styleable name="Seekbar" parent="Beats" >
+        <attr name="radius" />
+        <attr name="right_radius"/>
+        <attr name="left_radius"/>
+        <attr name="top_radius"/>
+        <attr name="bottom_radius"/>
+
+        <attr name="seek_shade" format="color"/>
+        <attr name="dotted" format="boolean"/>
+        <attr name="stroke_shade"/>
+        <attr name="stroke"/>
+        <attr name="shade"/>
+
+    </declare-styleable>
+
 </resources>

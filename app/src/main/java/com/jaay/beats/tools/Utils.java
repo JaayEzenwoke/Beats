@@ -132,6 +132,11 @@ public class Utils {
         return Color.argb(alpha, red, green, blue);
     }
 
+    public static int getTransluscency(int shade, int transluscence) {
+        int alpha = Math.max(0, Math.min(255, transluscence)); // Ensure alpha is within 0-255
+        return (alpha << 24) | (shade & 0x00FFFFFF); // Apply new alpha while keeping RGB
+    }
+
     public static void setImage (Context context, String path, ImageView thumbnail) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(context, Uri.parse(path));

@@ -13,6 +13,7 @@ package com.jaay.beats.uiviews;
 import static com.jaay.beats.tools.Utils.getTile;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,6 +25,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.jaay.beats.R;
 import com.jaay.beats.tools.Utils;
 
 public class Seekbar extends View {
@@ -34,6 +36,8 @@ public class Seekbar extends View {
     private Paint paint;
 
     private float additions;
+    private int seek_shade;
+    private boolean dotted;
 
     public Seekbar(Context context) {
         super(context);
@@ -42,11 +46,13 @@ public class Seekbar extends View {
     public Seekbar(Context context, @Nullable AttributeSet attributes) {
         super(context, attributes);
         setBackground(getTile(context, attributes).getWalllpaper());
+        initialize(context, attributes);
     }
 
     public Seekbar(Context context, @Nullable AttributeSet attributes, int style) {
         super(context, attributes, style);
         setBackground(getTile(context, attributes).getWalllpaper());
+        initialize(context, attributes);
     }
 
     {
@@ -54,9 +60,20 @@ public class Seekbar extends View {
         paint = new Paint() {
             {
                 setAntiAlias(true);
-                setColor(Color.RED);
+                setColor(seek_shade);
             }
         };
+    }
+
+    public void initialize(Context context, @Nullable AttributeSet attributes) {
+        TypedArray stylable = context.obtainStyledAttributes(attributes, R.styleable.Seekbar);
+        try{
+            seek_shade = stylable.getInt(R.styleable.Seekbar_seek_shade, 0);
+            dotted = stylable.getBoolean(R.styleable.Seekbar_dotted, false);
+            paint.setColor(seek_shade);
+        }finally {
+            stylable.recycle();
+        }
     }
 
     @Override
@@ -101,6 +118,8 @@ public class Seekbar extends View {
         int width = getWidth();
         int height = getHeight();
 
+        int circle_width = height;
+
         int padding_left = getPaddingLeft();
         int padding_top = getPaddingTop();
         int padding_right = getPaddingRight();
@@ -109,7 +128,23 @@ public class Seekbar extends View {
         width = width - padding_left - padding_right;
         height = height - padding_top - padding_bottom;
 
-        canvas.drawRoundRect(padding_left, padding_top, additions, padding_top + height,  0, height / 2F, paint);
+
+        if(dotted) {
+            float offset = height / 5F;
+
+            paint.setColor(Utils.getTransluscency(seek_shade, 32));
+            canvas.drawRoundRect(padding_left, offset, width, (padding_top + height) - offset,  circle_width, circle_width, paint);
+
+            paint.setColor(Utils.getTransluscency(seek_shade, 128));
+            canvas.drawRoundRect(padding_left, offset, additions, (padding_top + height) - offset,  height / 2F, height, paint);
+
+            paint.setColor(seek_shade);
+            float cx = additions > (circle_width / 2F) ? ((additions - (circle_width / 2F))) : 0;
+            canvas.drawRoundRect(cx, 0, cx + circle_width, circle_width, circle_width, circle_width, paint);
+        }else {
+            paint.setColor(seek_shade);
+            canvas.drawRoundRect(padding_left, padding_top, additions, padding_top + height,  0, 0, paint);
+        }
     }
 
     public void setAdditions(int time) {
@@ -119,14 +154,15 @@ public class Seekbar extends View {
 
             @Override
             public void run() {
+
                 if (additions < getWidth()) {
                     additions += unit;
                     invalidate();
-                    Utils.debug("additions: " + additions + " width: " + getWidth());
+//                    Utils.debug(getTag() + " --- additions: " + additions + " width: " + getWidth() + " unit: " + unit);
                     handler.postDelayed(this, 1000);
                 }else {
                     additions = 0;
-                    Utils.debug("XX additions: " + additions + " width: " + getWidth());
+//                    Utils.debug("XX additions: " + additions + " width: " + getWidth());
                     invalidate();
                 }
 

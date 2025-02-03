@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 //import androidx
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -33,12 +34,15 @@ import com.jaay.beats.important.Animator;
 import com.jaay.beats.important.evaluators.FloatEvaluator;
 import com.jaay.beats.important.evaluators.IntergerEvaluator;
 import com.jaay.beats.tools.Utils;
+import com.jaay.beats.types.Audio;
+import com.jaay.beats.uiviews.RollingText;
 import com.jaay.beats.uiviews.Seekbar;
 import com.jaay.beats.uiviews.Slate;
 import com.jaay.beats.uiviews.Stack;
 import com.jaay.beats.uiviews.Image;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Playing extends Slate {
 
@@ -47,8 +51,8 @@ public class Playing extends Slate {
         private Image track_thumbnail;
         private MediaPlayer player;
         private Stack artist_title;
-        private Seekbar seeker;
         private TextView title;
+        private Seekbar seeker;
         private TextView song;
         private Image play;
 
@@ -87,10 +91,17 @@ public class Playing extends Slate {
 
         public void initialize() {
             seeker.setPlayer(player);
-            duration = player.getDuration();
-            duration = duration / 1000;
-            Utils.debug("duration_now playing: " + duration);
-            seeker.setAdditions(duration);
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    duration = player.getDuration();
+                    Utils.debug("duration: " + duration + " player: " + player);
+                    duration = duration / 1000;
+                    seeker.handler.removeCallbacks(seeker.seeker);
+                    seeker.setAdditions(duration);
+                }
+            });
 
             play.setOnClickListener(new OnClickListener() {
 
@@ -163,9 +174,9 @@ public class Playing extends Slate {
 
     private MediaPlayer player;
     public NowPlaying dropper;
+    private RollingText title;
     public Seekbar seek_bar;
     public Image thumbnail;
-    private TextView title;
     private Stack play_box;
     private TextView song;
     private Image next;
@@ -218,13 +229,19 @@ public class Playing extends Slate {
         next = findViewById(R.id.next);
     }
 
-    public void initialize() {
+    public void initialize(ArrayList<Audio> tracks, int position) {
         seek_bar.setPlayer(player);
         duration = player.getDuration();
         duration = duration / 1000;
         seek_bar.handler.removeCallbacks(seek_bar.seeker);
         Utils.debug("duration: " + duration);
         seek_bar.setAdditions(duration);
+        title.startScrolling();
+
+        // Optional: Control the scrolling speed
+        title.setScrollDuration(8000);
+        title.setScrollDelay(2000);
+        title.setScrollDirection(false);
 
         play.setOnClickListener(new OnClickListener() {
 
@@ -237,12 +254,21 @@ public class Playing extends Slate {
                         seek_bar.pause(current_position);
                         play.setImage(R.drawable.play);
                         player.pause();
+                        title.pauseScrolling();
                     }else {
                         seek_bar.setAdditions(duration);
                         play.setImage(R.drawable.pause);
                         player.start();
+                        title.resumeScrolling();
                     }
                 }
+            }
+        });
+
+        next.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                player.stop();
             }
         });
     }

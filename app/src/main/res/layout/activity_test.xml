@@ -122,7 +122,7 @@
 
         android:orientation="vertical"
 
-        android:visibility="visible"
+        android:visibility="gone"
 
         app:shade="#FFA06327">
 
@@ -422,5 +422,40 @@
         </com.jaay.beats.uiviews.Stack>
 
     </com.jaay.beats.uiviews.Slate>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:background="#FF00FF00"
+        />
+
+    <com.jaay.beats.playground.Grid
+        android:id="@+id/grid"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:shade="@color/white"/>
+
+    <com.jaay.beats.uiviews.Text
+        android:id="@+id/debugger"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:padding="10sp"
+
+        android:text="debugger"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFFFF"
+        android:visibility="visible"
+
+        app:radius="25dp"
+        app:shade="@color/black"/>
+
 
 </com.jaay.beats.uiviews.Slate>

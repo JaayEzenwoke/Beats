@@ -21,6 +21,7 @@ public class Audio {
     private int played;
 
     private boolean favourite;
+    private boolean selected;
     private boolean marked;
 
     public Audio(String title, String path) {

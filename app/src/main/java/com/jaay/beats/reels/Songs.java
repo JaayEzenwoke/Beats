@@ -10,17 +10,18 @@
 
 package com.jaay.beats.reels;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,16 @@ public class Songs extends RecyclerView {
             @Override
             public void onClick(View view) {
                 if (listener != null) listener.onClick(view, getAdapterPosition());
+
+                // Store previous selection
+                int previous_position = selected_position;
+
+                // Update selected position
+                selected_position = getAdapterPosition();
+
+                // Notify changes to update UI
+                notifyItemChanged(previous_position);
+                notifyItemChanged(selected_position);
             }
         }
 
@@ -83,6 +94,8 @@ public class Songs extends RecyclerView {
         private ArrayList<Audio> tracks;
         private ArrayList<Audio> recent;
         private Listener listener;
+
+        private int selected_position = RecyclerView.NO_POSITION;
 
         public Adapter(Context context, ArrayList<Audio> tracks) {
             this.tracks = tracks;
@@ -101,6 +114,16 @@ public class Songs extends RecyclerView {
             holder.title.setText(tracks.get(position).getTitle());
             holder.song.setText(tracks.get(position).getArtist());
 
+            // Apply selection color logic
+            if (position == selected_position) {
+                holder.title.setTextColor(holder.itemView.getResources().getColor(R.color.beat_color));
+                holder.song.setTextColor(holder.itemView.getResources().getColor(R.color.beat_color));
+            } else {
+                holder.title.setTextColor(holder.itemView.getResources().getColor(R.color.grey2));
+                holder.song.setTextColor(holder.itemView.getResources().getColor(R.color.grey1));
+            }
+
+
             if (position == tracks.size()) {
                 holder.separator.setVisibility(INVISIBLE);
             }
@@ -118,8 +141,20 @@ public class Songs extends RecyclerView {
         public void setClickListener(Listener listener) {
             this.listener = listener;
         }
+
+        public void setSelectedPosition(int position) {
+            int previousSelected = selected_position;
+            selected_position = position;
+            notifyItemChanged(previousSelected);
+            notifyItemChanged(selected_position);
+        }
+
+        public ArrayList<Audio> getTracks() {
+            return tracks;
+        }
     }
 
+    private AudioManager audioManager;
     public ArrayList<Audio> tracks;
     private MediaPlayer player;
     private Activity activity;
@@ -131,6 +166,32 @@ public class Songs extends RecyclerView {
     private int current_position;
     private int previous_position;
     private int mode;
+
+    private AudioManager.OnAudioFocusChangeListener focusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    // Another app has taken audio focus permanently (e.g., another music player)
+                    stopMediaPlayer();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    // Temporarily lost audio focus (e.g., incoming call)
+                    pauseMediaPlayer();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Lower volume if another app (like a notification) is playing audio
+                    if (player != null) {
+                        player.setVolume(0.3f, 0.3f);
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    // Regained audio focus, resume playback
+                    resumeMediaPlayer();
+                    break;
+            }
+        }
+    };
 
     public Songs(@NonNull Context context) {
         super(context);
@@ -152,10 +213,6 @@ public class Songs extends RecyclerView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        int beat_color = getResources().getColor(R.color.beat_color);
-        int title_color = getResources().getColor(R.color.grey2);
-        int song_color = getResources().getColor(R.color.grey1);
-
         adapter.setClickListener(new Adapter.Listener() {
 
             @Override
@@ -164,10 +221,14 @@ public class Songs extends RecyclerView {
 
                 setCurrentPosition(position);
                 Audio audio = adapter.getItem(position);
+                playAudio(audio);
                 getPlaying().setVisibility(VISIBLE);
                 getNow_playing().initialize();
-                playAudio(audio);
-                setPrevious(adapter.getItem(position - 1));
+
+                if(position > 0) {
+                    setPrevious(adapter.getItem(position - 1));
+                }
+
                 setCurrent(audio);
                 if (adapter.tracks.size() > position) {
                     setNext(adapter.getItem(position + 1));
@@ -176,25 +237,12 @@ public class Songs extends RecyclerView {
                 getNow_playing().setImage(getContext(), getCurrent().getPath());
                 getNow_playing().setTitle(audio.getTitle(), audio.getArtist());
 
-                getPlaying().initialize();
+                getPlaying().initialize(tracks, position);
                 Utils.setImage(getContext(), getCurrent().getPath(), getPlaying().thumbnail);
 
-                TextView title = view.findViewById(R.id.title);
-                TextView song = view.findViewById(R.id.song);
+                adapter.setSelectedPosition(position);
 
-                title.setTextColor(beat_color);
-                song.setTextColor(beat_color);
 
-                if (previous_position > -1 && previous_position < adapter.tracks.size()) {
-                    Adapter.Holder previous = ((Adapter.Holder) findViewHolderForAdapterPosition(getPreviousPosition()));
-                    if(previous != null) {
-                        previous.title.setTextColor(title_color);
-                        previous.song.setTextColor(song_color);
-                    };
-
-                }
-
-                setPreviousPosition(current_position);
             }
         });
     }
@@ -268,7 +316,7 @@ public class Songs extends RecyclerView {
         return latest;
     }
 
-    private void playAudio(Audio audio) {
+    public void playAudio(Audio audio) {
         if (player.isPlaying()) {
             player.stop();
             player.reset();
@@ -281,6 +329,15 @@ public class Songs extends RecyclerView {
             player.start();
         } catch (IOException exception) {
 
+        }
+
+        audioManager = (AudioManager)  getActivity().getSystemService(Context.AUDIO_SERVICE);
+        int result = audioManager.requestAudioFocus(focusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            player.start();
         }
 
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -305,7 +362,35 @@ public class Songs extends RecyclerView {
         });
     }
 
-    private void repeatCurrent() {
+    private void pauseMediaPlayer() {
+        if (player != null && player.isPlaying()) {
+            player.pause();
+        }
+    }
+
+    private void releaseAudioFocus() {
+        if (audioManager != null) {
+            audioManager.abandonAudioFocus(focusChangeListener);
+        }
+    }
+
+    private void resumeMediaPlayer() {
+        if (player != null) {
+            player.setVolume(1.0f, 1.0f); // Restore volume
+            player.start();
+        }
+    }
+
+    private void stopMediaPlayer() {
+        if (player != null) {
+            player.stop();
+            player.release();
+            player = null;
+        }
+        releaseAudioFocus();
+    }
+
+    public void repeatCurrent() {
         int current = getCurrentPosition();
         Audio audio = adapter.getItem(current);
         playAudio(audio);

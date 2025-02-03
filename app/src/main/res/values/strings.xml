@@ -15,4 +15,5 @@
     <string name="delete_song">delete song</string>
     <string name="now_playing">now playing</string>
     <string name="all_songs">All Songs</string>
+    <string name="create_a_playlist">Create a Playlist</string>
 </resources>

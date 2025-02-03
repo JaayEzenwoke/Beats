@@ -21,6 +21,10 @@ import com.jaay.beats.R;
 
 public class Beats extends AppCompatActivity {
 
+    public static class States {
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

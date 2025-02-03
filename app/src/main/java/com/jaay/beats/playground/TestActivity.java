@@ -21,30 +21,23 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.widget.Toast;
 
 import com.jaay.beats.R;
 import com.jaay.beats.core.Beat;
 import com.jaay.beats.important.Animator;
-import com.jaay.beats.important.BackgroundService;
-import com.jaay.beats.important.evaluators.Evaluator;
 import com.jaay.beats.important.evaluators.FloatEvaluator;
 import com.jaay.beats.important.evaluators.IntergerEvaluator;
 import com.jaay.beats.tools.Utils;
@@ -54,10 +47,7 @@ import com.jaay.beats.uiviews.Seekbar;
 import com.jaay.beats.uiviews.Slate;
 import com.jaay.beats.uiviews.Stack;
 import com.jaay.beats.uiviews.Text;
-import com.waynejo.androidndkgif.GifEncoder;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -93,16 +83,14 @@ public class TestActivity extends AppCompatActivity {
 
 
     private View.OnTouchListener top_toucher;
+    private Grid grid;
+    private Text debugger;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-
-        Bitmap source = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.logo_tptxdev);
-        Utils.debug("source: " + source);
-        new GifGenerationTask().execute(source);
 
         // Start the background service to keep the app alive
 //        Intent serviceIntent = new Intent(this, BackgroundService.class);
@@ -126,6 +114,9 @@ public class TestActivity extends AppCompatActivity {
         handler.post(loggingRunnable);
 
 //        if(true) return;
+        grid = findViewById(R.id.grid);
+
+        debugger = findViewById(R.id.debugger);
         drag_test = findViewById(R.id.drag_test);
         play_box = findViewById(R.id.play_box);
         seekbar = findViewById(R.id.test_seekbar);
@@ -292,10 +283,61 @@ public class TestActivity extends AppCompatActivity {
 
             }
         });
+
+
     }
 
+    private Animator grid_animator;
     private Animator drag_animator;
     private Animator drooper;
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+
+            {
+
+            }
+            @Override
+            public void run() {
+                Utils.debug("height: " + grid.getHeight());
+                debugger.setText("" + grid.getHeight());
+                grid_animator = new Animator(new AnticipateOvershootInterpolator(), new IntergerEvaluator(grid.getHeight(), 0)) {
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onUpdate(Object[] animation_value) {
+                        Utils.debug("height: " + animation_value[0]);
+                        ViewGroup.LayoutParams params = grid.getLayoutParams();
+                        params.height = (int) animation_value[0];
+                        grid.setLayoutParams(params);
+                    }
+
+                    @Override
+                    public void onEnd() {
+
+                    }
+                };
+
+                grid_animator.setDuration(5000);
+
+            }
+        }, 1000);
+
+        debugger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                grid_animator.play();
+            }
+        });
+    }
+
     @SuppressLint("Range")
     private ArrayList<Audio> getTracks(Context context) {
         ArrayList<Audio> tracks = new ArrayList<>();
@@ -359,68 +401,6 @@ public class TestActivity extends AppCompatActivity {
             }
         }
     }
-
-    private class GifGenerationTask extends AsyncTask<Bitmap, Integer, File> {
-
-        @Override
-        protected File doInBackground(Bitmap... bitmaps) {
-            return createOptimizedGif(bitmaps[0]);
-        }
-
-        @Override
-        protected void onPostExecute(File gifFile) {
-            if (gifFile != null) {
-                Log.d("GIF", "GIF saved at: " + gifFile.getAbsolutePath());
-            }
-        }
-    }
-
-    private  File createOptimizedGif(Bitmap source) {
-        File outputDir = getExternalFilesDir(null);
-        if (outputDir == null) {
-            System.err.println("Failed to access external storage directory.");
-            
-        }
-
-        if (!outputDir.exists()) {
-            outputDir.mkdirs();
-        }
-
-
-        File outputFile = new File(outputDir, "optimized_rotation.gif");
-        GifEncoder gifEncoder = new GifEncoder();
-
-        try {
-            gifEncoder.init(source.getWidth() / 2, source.getHeight() / 2, outputFile.getAbsolutePath(), GifEncoder.EncodingType.ENCODING_TYPE_FAST);
-            for (int i = 0; i <= 360; i += 5) {  // Use 5-degree steps for speed
-                float scale = 0.9f + 0.1f * (float) Math.cos(Math.toRadians(i));
-                Bitmap frame = generateFrame(source, scale, i);
-
-                gifEncoder.encodeFrame(frame, 40);
-                frame.recycle();
-                Log.d("GIF", "Frame " + i + " processed");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            gifEncoder.close();
-            Log.d("GIF", "GIF creation completed!");
-        }
-        return outputFile;
-    }
-
-    private Bitmap generateFrame(Bitmap source, float scale, float rotation) {
-        int width = source.getWidth() / 2;
-        int height = source.getHeight() / 2;
-        Bitmap frame = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(frame);
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale, width / 2f, height / 2f);
-        matrix.postRotate(rotation, width / 2f, height / 2f);
-        canvas.drawBitmap(Bitmap.createScaledBitmap(source, width, height, false), matrix, null);
-        return frame;
-    }
-
 }
 
 

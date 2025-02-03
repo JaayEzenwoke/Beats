@@ -22,7 +22,10 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
 
-        app:shade="#00000000"/>
+        android:tag="now_playing"
+
+        app:dotted="false"
+        app:seek_shade="#FF38210A" />
 
     <com.jaay.beats.uiviews.Slate
         android:layout_width="match_parent"

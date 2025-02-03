@@ -84,22 +84,21 @@
             android:scaleType="centerCrop"
 
             android:src="@drawable/lambo"
-            android:tint="@color/beat_color"
-            android:tintMode="multiply"
 
             app:radius="32dp" />
 
-        <com.jaay.beats.uiviews.Text
+        <com.jaay.beats.uiviews.RollingText
             android:id="@+id/title"
 
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
 
+            android:singleLine="true"
+            android:text="This is a very long song title that will scroll..."
             android:textStyle="bold"
-            android:text="title"
             android:textSize="20sp"/>
 
         <com.jaay.beats.uiviews.Text
@@ -116,12 +115,15 @@
             android:id="@+id/seek_bar"
 
             android:layout_width="match_parent"
-            android:layout_height="10dp"
+            android:layout_height="18dp"
 
             android:layout_gravity="center"
             android:layout_marginTop="5dp"
 
-            app:shade="#40000000" />
+            android:tag="playing"
+
+            app:seek_shade="#FF000000"
+            app:dotted="true"/>
 
         <com.jaay.beats.uiviews.Slate
             android:layout_width="match_parent"

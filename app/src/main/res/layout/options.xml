@@ -14,8 +14,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <View
         android:id="@+id/blocker"
@@ -28,11 +27,14 @@
     <com.jaay.beats.uiviews.Stack
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:layout_gravity="center_vertical"
-        android:layout_margin="15dp"
+        android:layout_margin="35dp"
+        android:padding="25dp"
 
         android:orientation="vertical"
 
+        app:shade="#FF38210A"
         app:radius="30dp">
 
         <com.jaay.beats.uiviews.Slate
