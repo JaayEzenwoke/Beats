@@ -28,7 +28,6 @@ public class Beats extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_beats);
 
         Window window = getWindow();
         int beat_color = getResources().getColor(R.color.beat_color);

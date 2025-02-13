@@ -93,11 +93,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
 
             android:singleLine="true"
-            android:text="This is a very long song title that will scroll..."
+            tools:text="This is a very long song title that will scroll..."
             android:textStyle="bold"
             android:textSize="20sp"/>
 
@@ -106,9 +105,8 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
 
-            android:text="Artist"
+            tools:text="Artist"
             android:textSize="20sp"/>
 
         <com.jaay.beats.uiviews.Seekbar

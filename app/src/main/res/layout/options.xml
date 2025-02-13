@@ -90,12 +90,78 @@
                 android:src="@drawable/like"
                 />
         </com.jaay.beats.uiviews.Slate>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_below="@+id/options"
 
             android:background="#40888888" />
+
+        <com.jaay.beats.uiviews.Slate
+            android:id="@+id/add_plalist"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <com.jaay.beats.uiviews.Text
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+
+                android:text="@string/add_to_playlist"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Image
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="center_vertical|end"
+
+                android:src="@drawable/add"
+                />
+        </com.jaay.beats.uiviews.Slate>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@+id/options"
+
+            android:background="#40888888" />
+
+        <com.jaay.beats.uiviews.Slate
+            android:id="@+id/edit_track"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <com.jaay.beats.uiviews.Text
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+
+                android:text="@string/edit_song"
+                android:textSize="20sp"/>
+
+            <com.jaay.beats.uiviews.Image
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+
+                android:layout_gravity="center_vertical|end"
+
+                android:src="@drawable/edit_audio"
+                />
+        </com.jaay.beats.uiviews.Slate>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@+id/options"
+
+            android:background="#40888888" />
+
+
         <com.jaay.beats.uiviews.Slate
             android:id="@+id/set_ringtone"
 

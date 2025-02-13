@@ -23,8 +23,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 //import androidx
-import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -48,13 +46,13 @@ public class Playing extends Slate {
 
     public static class  NowPlaying extends Stack {
  
-        private Image track_thumbnail;
-        private MediaPlayer player;
-        private Stack artist_title;
-        private TextView title;
-        private Seekbar seeker;
-        private TextView song;
-        private Image play;
+        public Image track_thumbnail;
+        public MediaPlayer player;
+        public Stack artist_title;
+        public TextView title;
+        public Seekbar seeker;
+        public TextView song;
+        public Image play;
 
         int duration;
 
@@ -89,6 +87,36 @@ public class Playing extends Slate {
             play = findViewById(R.id.play);
         }
 
+        @Override
+        protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
+
+            play.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if(player != null) {
+                        Playing playing = (Playing) getParent().getParent();
+                        if(player.isPlaying()) {
+                            float current_position = (float) player.getCurrentPosition() / 1000;
+                            current_position /= duration;
+                            seeker.pause(current_position);
+                            playing.seek_bar.pause(current_position);
+                            playing.play.setImage(R.drawable.play);
+                            play.setImage(R.drawable.play);
+                            player.pause();
+                        }else {
+                            seeker.setAdditions(duration);
+                            playing.seek_bar.setAdditions(duration);
+                            playing.play.setImage(R.drawable.pause);
+                            play.setImage(R.drawable.pause);
+                            player.start();
+                        }
+                    }
+                }
+            });
+        }
+
         public void initialize() {
             seeker.setPlayer(player);
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -100,26 +128,6 @@ public class Playing extends Slate {
                     duration = duration / 1000;
                     seeker.handler.removeCallbacks(seeker.seeker);
                     seeker.setAdditions(duration);
-                }
-            });
-
-            play.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if(player != null) {
-                        if(player.isPlaying()) {
-                            float current_position = (float) player.getCurrentPosition() / 1000;
-                            current_position /= duration;
-                            seeker.pause(current_position);
-                            play.setImage(R.drawable.play);
-                            player.pause();
-                        }else {
-                            seeker.setAdditions(duration);
-                            play.setImage(R.drawable.pause);
-                            player.start();
-                        }
-                    }
                 }
             });
 
@@ -172,23 +180,27 @@ public class Playing extends Slate {
         }
     }
 
-    private MediaPlayer player;
+    private Songs songs;
+
+    public MediaPlayer player;
     public NowPlaying dropper;
-    private RollingText title;
+    public RollingText title;
     public Seekbar seek_bar;
     public Image thumbnail;
-    private Stack play_box;
-    private TextView song;
-    private Image next;
-    private Image back;
-    private Image prev;
-    private Image play;
+    public Stack play_box;
+    public TextView artist;
+    public Image next;
+    public Image back;
+    public Image prev;
+    public Image play;
 
-    private View.OnTouchListener top_toucher;
-    private Animator animator;
+    public View.OnTouchListener top_toucher;
+    public Animator animator;
 
-    private int duration;
-    private int offset;
+    public int duration;
+    public int offset;
+
+    public int current;
 
     public Playing(Context context) {
         super(context);
@@ -199,37 +211,25 @@ public class Playing extends Slate {
 
         int resource = R.layout.playing;
         LayoutInflater.from(context).inflate(resource, this);
+
         thumbnail = findViewById(R.id.thumbnail);
         play_box = findViewById(R.id.play_box);
         seek_bar = findViewById(R.id.seek_bar);
         dropper = findViewById(R.id.dropper);
         title = findViewById(R.id.title);
-        song = findViewById(R.id.song);
+        artist = findViewById(R.id.artist);
         play = findViewById(R.id.play);
         back = findViewById(R.id.back);
         prev = findViewById(R.id.prev);
         next = findViewById(R.id.next);
         back = findViewById(R.id.back);
-        back = findViewById(R.id.back);
     }
 
     public Playing(Context context, @Nullable AttributeSet attributes, int style) {
         super(context, attributes, style);
-
-        int resource = R.layout.playing;
-        LayoutInflater.from(context).inflate(resource, this);
-
-        seek_bar = findViewById(R.id.seek_bar);
-        title = findViewById(R.id.title);
-        song = findViewById(R.id.song);
-        play = findViewById(R.id.play);
-
-        thumbnail = findViewById(R.id.thumbnail);
-        prev = findViewById(R.id.previous);
-        next = findViewById(R.id.next);
     }
 
-    public void initialize(ArrayList<Audio> tracks, int position) {
+    public void initialize() {
         seek_bar.setPlayer(player);
         duration = player.getDuration();
         duration = duration / 1000;
@@ -242,6 +242,12 @@ public class Playing extends Slate {
         title.setScrollDuration(8000);
         title.setScrollDelay(2000);
         title.setScrollDirection(false);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
 
         play.setOnClickListener(new OnClickListener() {
 
@@ -251,14 +257,25 @@ public class Playing extends Slate {
                     if(player.isPlaying()) {
                         float current_position = (float) player.getCurrentPosition() / 1000;
                         current_position /= duration;
+
                         seek_bar.pause(current_position);
+                        dropper.seeker.pause(current_position);
+
                         play.setImage(R.drawable.play);
+                        dropper.play.setImage(R.drawable.play);
+
                         player.pause();
+
                         title.pauseScrolling();
                     }else {
                         seek_bar.setAdditions(duration);
+                        dropper.seeker.pause(duration);
+
                         play.setImage(R.drawable.pause);
+                        dropper.play.setImage(R.drawable.pause);
+
                         player.start();
+
                         title.resumeScrolling();
                     }
                 }
@@ -266,17 +283,22 @@ public class Playing extends Slate {
         });
 
         next.setOnClickListener(new OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 player.stop();
+                songs.playNext();
             }
         });
-    }
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
+        back.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                player.stop();
+                songs.playPrev();
+            }
+        });
 
         View.OnTouchListener back_toucher = new View.OnTouchListener() {
 
@@ -369,7 +391,17 @@ public class Playing extends Slate {
         return player;
     }
 
+    public void setSongs(Songs songs) {
+        this.songs = songs;
+    }
+
+    public void setTitle(String title, String artist) {
+        this.title.setText(title);
+        this.artist.setText(artist);
+    }
+
     public void setPlayer(MediaPlayer player) {
         this.player = player;
     }
+
 }

@@ -64,13 +64,4 @@
 
         android:visibility="gone" />
 
-    <com.jaay.beats.uiviews.Options
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_gravity="center"
-        android:padding="16dp"
-
-        android:visibility="visible" />
-
 </com.jaay.beats.uiviews.Slate>

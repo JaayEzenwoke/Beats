@@ -153,4 +153,14 @@ public class Utils {
             exception.printStackTrace();
         }
     }
+
+    public static byte[] getImage (Context context, String path) {
+        try (MediaMetadataRetriever retriever = new MediaMetadataRetriever()) {
+            retriever.setDataSource(context, Uri.parse(path));
+
+            return retriever.getEmbeddedPicture();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

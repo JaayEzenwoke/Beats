@@ -148,6 +148,7 @@ public class Seekbar extends View {
     }
 
     public void setAdditions(int time) {
+        if (time < 1) return;
         float unit = (float) getWidth() / time;
 
         seeker = new Runnable() {
@@ -158,11 +159,9 @@ public class Seekbar extends View {
                 if (additions < getWidth()) {
                     additions += unit;
                     invalidate();
-//                    Utils.debug(getTag() + " --- additions: " + additions + " width: " + getWidth() + " unit: " + unit);
                     handler.postDelayed(this, 1000);
                 }else {
                     additions = 0;
-//                    Utils.debug("XX additions: " + additions + " width: " + getWidth());
                     invalidate();
                 }
 

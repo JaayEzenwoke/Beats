@@ -10,8 +10,6 @@
 
 package com.jaay.beats.reels;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -25,6 +23,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -154,6 +153,10 @@ public class Songs extends RecyclerView {
         }
     }
 
+    private Playing.NowPlaying now_playing;
+    private Playing playing;
+
+
     private AudioManager audioManager;
     public ArrayList<Audio> tracks;
     private MediaPlayer player;
@@ -166,6 +169,8 @@ public class Songs extends RecyclerView {
     private int current_position;
     private int previous_position;
     private int mode;
+    
+    boolean is_playing;
 
     private AudioManager.OnAudioFocusChangeListener focusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
@@ -225,6 +230,8 @@ public class Songs extends RecyclerView {
                 getPlaying().setVisibility(VISIBLE);
                 getNow_playing().initialize();
 
+                getPlaying().setSongs(Songs.this);
+
                 if(position > 0) {
                     setPrevious(adapter.getItem(position - 1));
                 }
@@ -234,15 +241,24 @@ public class Songs extends RecyclerView {
                     setNext(adapter.getItem(position + 1));
                 }
 
-                getNow_playing().setImage(getContext(), getCurrent().getPath());
                 getNow_playing().setTitle(audio.getTitle(), audio.getArtist());
 
-                getPlaying().initialize(tracks, position);
-                Utils.setImage(getContext(), getCurrent().getPath(), getPlaying().thumbnail);
+                getPlaying().initialize();
+                getPlaying().setTitle(audio.getTitle(), audio.getArtist());
+
+                if (Utils.getImage(getContext(), getCurrent().getPath()) == null) {
+                    getNow_playing().track_thumbnail.setImage(R.drawable.disc_icon);
+                    getPlaying().thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    getPlaying().thumbnail.setImage(R.drawable.disc_icon);
+                }else {
+                    Utils.setImage(getContext(), getCurrent().getPath(), getPlaying().thumbnail);
+                    getNow_playing().setImage(getContext(), getCurrent().getPath());
+                }
+
 
                 adapter.setSelectedPosition(position);
-
-
+                is_playing = true;
+                
             }
         });
     }
@@ -253,9 +269,6 @@ public class Songs extends RecyclerView {
         adapter = new Adapter(context, tracks);
         setAdapter(adapter);
     }
-
-    private Playing.NowPlaying now_playing;
-    private Playing playing;
 
     @SuppressLint("Range")
     private ArrayList<Audio> getTracks(Context context) {
@@ -375,6 +388,7 @@ public class Songs extends RecyclerView {
     }
 
     private void resumeMediaPlayer() {
+        if (!is_playing) return;
         if (player != null) {
             player.setVolume(1.0f, 1.0f); // Restore volume
             player.start();
@@ -395,6 +409,7 @@ public class Songs extends RecyclerView {
         Audio audio = adapter.getItem(current);
         playAudio(audio);
         getNow_playing().initialize();
+        getPlaying().initialize();
         setCurrentPosition(current);
     }
 
@@ -405,6 +420,7 @@ public class Songs extends RecyclerView {
             Audio audio = adapter.getItem(current);
             playAudio(audio);
             getNow_playing().initialize();
+            getPlaying().initialize();
         } else {
             current = 0;
             playAudio(adapter.getItem(current));
@@ -418,16 +434,32 @@ public class Songs extends RecyclerView {
         Audio audio = adapter.getItem(current);
         playAudio(audio);
         getNow_playing().initialize();
+        getPlaying().initialize();
         setCurrentPosition(getRandom(0, max));
     }
 
-    private void playNext() {
+    public void playNext() {
         int current = getCurrentPosition();
         current++;
         if (current < adapter.getItemCount()) {
             Audio audio = adapter.getItem(current);
             playAudio(audio);
             getNow_playing().initialize();
+            getPlaying().initialize();
+        } else {
+            player.reset();
+        }
+        setCurrentPosition(current);
+    }
+
+    public void playPrev() {
+        int current = getCurrentPosition();
+        current--;
+        if (current > -1) {
+            Audio audio = adapter.getItem(current);
+            playAudio(audio);
+            getNow_playing().initialize();
+            getPlaying().initialize();
         } else {
             player.reset();
         }
