@@ -9,12 +9,13 @@
   ~        http://www.apache.org/licenses/LICENSE-2.0
   -->
 
-<com.jaay.beats.uiviews.Slate xmlns:android="http://schemas.android.com/apk/res/android"
+<com.jaay.beats.uiviews.Slate
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:aap="http://schemas.android.com/tools"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:aap="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <view class="com.jaay.beats.reels.AllPlaylists$Playlists"
         android:id="@+id/all_playlists"
@@ -46,7 +47,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:visibility="gone" />
+        android:padding="26dp"
+
+        android:visibility="gone"
+
+        app:shade="#FF000000" />
 
     <view class="com.jaay.beats.reels.AllPlaylists$AddSongs"
         android:id="@+id/add_songs"
@@ -54,7 +59,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:visibility="gone" />
+        android:orientation="vertical"
+
+        android:padding="0dp"
+
+        android:visibility="gone"
+
+        app:shade="#FF000000" />
 
     <view class="com.jaay.beats.reels.AllPlaylists$Playlists$PlaylistTracks"
         android:id="@+id/playlist_tracks"

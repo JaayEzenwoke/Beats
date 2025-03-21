@@ -313,7 +313,6 @@ public class TestActivity extends AppCompatActivity {
 
                     @Override
                     public void onUpdate(Object[] animation_value) {
-                        Utils.debug("height: " + animation_value[0]);
                         ViewGroup.LayoutParams params = grid.getLayoutParams();
                         params.height = (int) animation_value[0];
                         grid.setLayoutParams(params);

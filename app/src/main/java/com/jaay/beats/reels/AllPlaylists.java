@@ -10,14 +10,18 @@
 
 package com.jaay.beats.reels;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jaay.beats.R;
 import com.jaay.beats.design.Background;
+import com.jaay.beats.tools.Utils;
 import com.jaay.beats.types.Audio;
 import com.jaay.beats.types.Playlist;
 import com.jaay.beats.uiviews.Check;
@@ -41,6 +46,7 @@ import com.jaay.beats.uiviews.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class AllPlaylists extends Slate {
 
@@ -48,92 +54,18 @@ public class AllPlaylists extends Slate {
 
         public static class PlaylistTracks extends Stack {
 
-            public static class Contents extends RecyclerView {
+            public static class Contents extends Songs {
 
-                public static class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
-
-                    public class Holder extends ViewHolder implements OnClickListener {
-
-                        public View separator;
-                        public TextView title;
-                        public TextView song;
-                        public Dots dots;
-
-                        public Holder(View view) {
-                            super(view);
-
-                            separator = view.findViewById(R.id.separator);
-                            title = view.findViewById(R.id.title);
-                            song = view.findViewById(R.id.song);
-                            dots = view.findViewById(R.id.options);
-
-                            view.setOnClickListener(this);
-                            dots.setOnClickListener(new OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    AllPlaylists.options.setVisibility(VISIBLE);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onClick(View view) {
-                            if (listener != null) listener.onClick(view, getAdapterPosition());
-                        }
-                    }
-
-                    public interface Listener {
-                        void onClick(View view, int position);
-                    }
-
-                    private ArrayList<Audio> tracks;
-                    private LayoutInflater inflater;
-                    private Listener listener;
+                public static class Adapter extends Songs.Adapter {
 
                     public Adapter(Context context, ArrayList<Audio> tracks) {
+                        super(context, tracks);
+                    }
+
+                    public void setTracks(ArrayList<Audio> tracks) {
                         this.tracks = tracks;
-                        inflater = LayoutInflater.from(context);
                     }
-
-                    @NonNull
-                    @Override
-                    public Holder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
-                        View view = inflater.inflate(R.layout.song, parent, false);
-                        return new Holder(view);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(@NonNull Holder holder, int position) {
-
-                        if(tracks.get(position) == null) {
-                        }else {
-                            holder.song.setText(tracks.get(position).getArtist());
-                            holder.title.setText(tracks.get(position).getTitle());
-                        }
-
-                        if (position == tracks.size()) {
-                            holder.separator.setVisibility(INVISIBLE);
-                        }
-                    }
-
-                    @Override
-                    public int getItemCount() {
-                        return tracks.size();
-                    }
-
-                    public Audio getItem(int position) {
-                        return tracks.get(position);
-                    }
-
-                    void setClickListener(Listener listener) {
-                        this.listener = listener;
-                    }
-
                 }
-
-                public ArrayList<Audio> tracks;
-                private MediaPlayer player;
-                private Adapter adapter;
 
                 public Contents(@NonNull Context context) {
                     super(context);
@@ -141,64 +73,16 @@ public class AllPlaylists extends Slate {
 
                 public Contents(@NonNull Context context, @Nullable AttributeSet attributes) {
                     super(context, attributes);
-
-
                 }
 
                 public Contents(@NonNull Context context, @Nullable AttributeSet attributes, int style) {
                     super(context, attributes, style);
-
                 }
 
                 @Override
                 protected void onAttachedToWindow() {
                     super.onAttachedToWindow();
-                }
 
-                public void initialize(Context context) {
-                    tracks = getTracks();
-                    setLayoutManager(new LinearLayoutManager(context));
-                    adapter = new Adapter(context, tracks);
-                    adapter.setClickListener(new Adapter.Listener() {
-
-                        @Override
-                        public void onClick(View view, int position) {
-                            playAudio(adapter.getItem(position));
-                        }
-
-                    });
-                    setAdapter(adapter);
-
-                }
-
-                private void playAudio(Audio audio) {
-                    if (player.isPlaying()) {
-                        player.stop();
-                        player.reset();
-                    }
-
-                    try {
-                        player.setDataSource(audio.getPath());
-                        player.prepare();
-                        player.start();
-                    } catch (IOException exception) {
-                    }
-                }
-
-                public ArrayList<Audio> getTracks() {
-                    return tracks;
-                }
-
-                public void setTracks(ArrayList<Audio> tracks) {
-                    this.tracks = tracks;
-                }
-
-                public MediaPlayer getPlayer() {
-                    return player;
-                }
-
-                public void setPlayer(MediaPlayer player) {
-                    this.player = player;
                 }
             }
 
@@ -234,7 +118,7 @@ public class AllPlaylists extends Slate {
             }
 
             public void initialize(Context context) {
-                contents.initialize(context);
+//                contents.initialize(context);
             }
 
         }
@@ -259,9 +143,10 @@ public class AllPlaylists extends Slate {
                     view.setOnClickListener(this);
 
                     dots.setOnClickListener(new OnClickListener() {
+
                         @Override
                         public void onClick(View view) {
-                            AllPlaylists.options.setVisibility(VISIBLE);
+                            all_playlists.options.setVisibility(VISIBLE);
                         }
                     });
                 }
@@ -269,6 +154,15 @@ public class AllPlaylists extends Slate {
                 @Override
                 public void onClick(View view) {
                     if (listener != null) listener.onClick(view, getAdapterPosition());
+                }
+
+                public AllPlaylists all_playlists;
+                public AllPlaylists getAll_playlists() {
+                    return all_playlists;
+                }
+
+                public void setAll_playlists(AllPlaylists all_playlists) {
+                    this.all_playlists = all_playlists;
                 }
 
             }
@@ -295,9 +189,10 @@ public class AllPlaylists extends Slate {
                 return holder;
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onBindViewHolder(@NonNull Holder holder, int position) {
-                holder.song_count.setText(playlists.get(position).getSongCount() + "");
+                holder.song_count.setText(playlists.get(position).getSongCount() + " tracks");
                 holder.name.setText(playlists.get(position).getName());
 
                 if (position == playlists.size()) {
@@ -323,6 +218,7 @@ public class AllPlaylists extends Slate {
             }
         }
 
+        public AllPlaylists all_playlists;
         public ArrayList<Playlist> playlists;
         private Adapter adapter;
 
@@ -348,20 +244,28 @@ public class AllPlaylists extends Slate {
                 @Override
                 public void onClick(View view, int position) {
 
-                    create.setVisibility(GONE);
-                    add_songs.setVisibility(GONE);
-                    AllPlaylists.add.setVisibility(GONE);
-                    AllPlaylists.playlists.setVisibility(GONE);
+                    all_playlists.create.setVisibility(GONE);
+                    all_playlists.add_songs.setVisibility(GONE);
+                    all_playlists.add.setVisibility(GONE);
+                    all_playlists.playlists.setVisibility(GONE);
 
-                    playlist_tracks.contents.setTracks(playlists.get(position).getTracks());
-                    playlist_tracks.initialize(context);
-                    playlist_tracks.setName(adapter.getItem(position).getName());
+//                    all_playlists.playlist_tracks.contents.setTracks(playlists.get(position).getTracks());
+                    all_playlists.playlist_tracks.initialize(context);
+                    all_playlists.playlist_tracks.setName(adapter.getItem(position).getName());
 
-                    playlist_tracks.setVisibility(VISIBLE);
+                    all_playlists.playlist_tracks.setVisibility(VISIBLE);
                 }
             });
 
             setAdapter(adapter);
+        }
+
+        public AllPlaylists getAll_playlists() {
+            return all_playlists;
+        }
+
+        public void setAll_playlists(AllPlaylists all_playlists) {
+            this.all_playlists = all_playlists;
         }
 
         public void recentlyAdded() {
@@ -380,6 +284,12 @@ public class AllPlaylists extends Slate {
             super.onAttachedToWindow();
         }
 
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            super.onLayout(changed, l, t, r, b);
+            Utils.debug(" [1] adapter: " + all_playlists.playlists.adapter.hashCode() + " | playlists: " + all_playlists.playlists.hashCode());
+        }
+
         public void setPlaylists(ArrayList<Playlist> playlists) {
             this.playlists = playlists;
         }
@@ -388,18 +298,32 @@ public class AllPlaylists extends Slate {
             return playlists;
         }
 
+        public void refreshPlaylists() {
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        scrollToPosition(adapter.getItemCount() - 1);
+                    }
+                });
+            }
+        }
+
     }
 
     public static class CreatePlaylist extends Slate {
-
+        public AllPlaylists all_playlists;
         private Text playlist_name;
         private Edit playlist_bar;
         private Playlist playlist;
+        private ArrayList<Audio> tracks;
         private Text added_number;
-        private Text add_songs;
+        private Stack create_box;
+        private Text add_tracks;
+        private String name;
         private Text done;
 
-        private String name;
 
         public CreatePlaylist(@NonNull Context context) {
             super(context);
@@ -414,7 +338,7 @@ public class AllPlaylists extends Slate {
             playlist_name = findViewById(R.id.playlist_name);
             playlist_bar  = findViewById(R.id.playlist_bar);
             added_number  = findViewById(R.id.added_number);
-            add_songs     = findViewById(R.id.add_tracks);
+            add_tracks     = findViewById(R.id.add_tracks);
             done          = findViewById(R.id.done);
 
         }
@@ -428,7 +352,8 @@ public class AllPlaylists extends Slate {
             playlist_name = findViewById(R.id.playlist_name);
             playlist_bar  = findViewById(R.id.playlist_bar);
             added_number  = findViewById(R.id.added_number);
-            add_songs     = findViewById(R.id.add_songs);
+            add_tracks     = findViewById(R.id.add_songs);
+            create_box  = findViewById(R.id.create_box);
             done          = findViewById(R.id.done);
 
         }
@@ -443,19 +368,41 @@ public class AllPlaylists extends Slate {
                 public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
                     if(actionId == EditorInfo.IME_ACTION_DONE) {
                         name = playlist_bar.getText().toString();
+                        playlist_name.setText(name + "");
+                        hideKeyboard(playlist_bar);
                         return true;
                     }
                     return false;
                 }
             });
 
-            add_songs.setOnClickListener(new OnClickListener() {
+            playlist_bar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    Rect r = new Rect();
+                    playlist_bar.getWindowVisibleDisplayFrame(r);
+                    int screenHeight = playlist_bar.getRootView().getHeight();
+                    int keypadHeight = screenHeight - r.bottom;
+
+                    if (keypadHeight > screenHeight * 0.15) { // Adjust threshold if needed
+                        added_number.setVisibility(GONE);
+                        add_tracks.setVisibility(GONE);
+                        done.setVisibility(GONE);
+                    } else {
+                        added_number.setVisibility(VISIBLE);
+                        add_tracks.setVisibility(VISIBLE);
+                        done.setVisibility(VISIBLE);
+                    }
+                }
+            });
+
+            add_tracks.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-                    AllPlaylists.playlists.setVisibility(GONE);
-                    AllPlaylists.create.setVisibility(GONE);
-                    AllPlaylists.add_songs.setVisibility(VISIBLE);
+                    all_playlists.playlists.setVisibility(GONE);
+                    all_playlists.create.setVisibility(GONE);
+                    all_playlists.add_songs.setVisibility(VISIBLE);
                 }
             });
 
@@ -464,14 +411,49 @@ public class AllPlaylists extends Slate {
                 {
                     playlist = new Playlist(name);
                 }
+                @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onClick(View view) {
-                    playlist.setTracks(AllPlaylists.add_songs.getPlaylistTracks());
-                    AllPlaylists.playlists.playlists.add(playlist);
-                    CreatePlaylist.this.setVisibility(GONE);
+                    name = playlist_bar.getText().toString();
+                    playlist = new Playlist(name);
+                    playlist_name.setText(name + "");
+                    playlist.setTracks(tracks);
+
+                    all_playlists.playlists.adapter.playlists.add(playlist);
+                    all_playlists.playlists.adapter.notifyDataSetChanged();
+
+                    setVisibility(GONE);
+                    all_playlists.playlists.setVisibility(VISIBLE);
+
                 }
             });
+        }
 
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void setVisibility(int visibility) {
+            super.setVisibility(visibility);
+
+            if(tracks != null) {
+                if(!tracks.isEmpty()) {
+                    added_number.setText(Utils.abbreviateNumber(tracks.size()) + " songs added");
+                }
+            }
+        }
+
+        private void hideKeyboard(View view) {
+            InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
+
+        public AllPlaylists getAll_playlists() {
+            return all_playlists;
+        }
+
+        public void setAll_playlists(AllPlaylists all_playlists) {
+            this.all_playlists = all_playlists;
         }
 
     }
@@ -513,7 +495,6 @@ public class AllPlaylists extends Slate {
                 check.setChecked(false);
             }
 
-
         }
 
         public static class Addlist extends RecyclerView {
@@ -553,10 +534,12 @@ public class AllPlaylists extends Slate {
                 private LayoutInflater inflater;
                 private ArrayList<Audio> tracks;
                 private Listener listener;
+                private HashSet<Integer> selected_tracks;
 
                 public Adapter(Context context, ArrayList<Audio> tracks) {
                     this.tracks = tracks;
                     inflater = LayoutInflater.from(context);
+                    selected_tracks = new HashSet<>();
                 }
 
                 @NonNull
@@ -571,17 +554,17 @@ public class AllPlaylists extends Slate {
                     holder.title.setText(tracks.get(position).getTitle());
                     holder.song.setText(tracks.get(position).getArtist());
 
-                    if(add_songs.check.isChecked()) {
-                        holder.check.setSelection(true);
-                    }
-                    if(holder.check.isChecked()) {
-                        holder.check.setSelection(true);
-                    }else {
-                        holder.check.setSelection(false);
-                    }
+                    // Set the check state based on selectedPositions
+                    boolean isSelected = selected_tracks.contains(position);
+                    holder.check.setSelection(isSelected);
+
+                    // Update the Audio object's marked state to match
+                    tracks.get(position).setMarked(isSelected);
 
                     if (position == tracks.size()) {
                         holder.separator.setVisibility(INVISIBLE);
+                    } else {
+                        holder.separator.setVisibility(VISIBLE);
                     }
                 }
 
@@ -598,9 +581,47 @@ public class AllPlaylists extends Slate {
                     this.listener = listener;
                 }
 
+                @SuppressLint("NotifyDataSetChanged")
                 public void setTracks(ArrayList<Audio> tracks) {
                     this.tracks = tracks;
                     notifyDataSetChanged();
+                }
+
+                // Add methods to handle selection state
+                public void toggleSelection(int position) {
+                    if (selected_tracks.contains(position)) {
+                        selected_tracks.remove(position);
+                    } else {
+                        selected_tracks.add(position);
+                    }
+                    notifyItemChanged(position);
+                }
+
+                public void selectAll() {
+                    selected_tracks.clear();
+                    for (int i = 0; i < tracks.size(); i++) {
+                        selected_tracks.add(i);
+                    }
+                    notifyDataSetChanged();
+                }
+
+                public void clearSelections() {
+                    selected_tracks.clear();
+                    notifyDataSetChanged();
+                }
+
+                public ArrayList<Audio> getSelectedTracks() {
+                    ArrayList<Audio> selected_songs = new ArrayList<>();
+                    for (Integer position : selected_tracks) {
+                        if (position < tracks.size()) {
+                            selected_songs.add(tracks.get(position));
+                        }
+                    }
+                    return selected_songs;
+                }
+
+                public boolean isAllSelected() {
+                    return selected_tracks.size() == tracks.size();
                 }
 
             }
@@ -621,41 +642,27 @@ public class AllPlaylists extends Slate {
                 super(context, attributes, style);
             }
 
-            @Override
-            protected void onAttachedToWindow() {
-                super.onAttachedToWindow();
-            }
-
             public void initialize(Context context) {
                 tracks = getTracks();
-                temporary  = new ArrayList<>(tracks.size());
-                for (int i = 0; i < tracks.size(); i++) {
-                    temporary.add(null);
-                }
 
                 setLayoutManager(new LinearLayoutManager(context));
                 adapter = new Adapter(context, tracks);
+
                 adapter.setClickListener(new Adapter.Listener() {
 
                     @Override
                     public void onClick(View view, int position) {
-                        AddSongs.Selection selection = (AddSongs.Selection) view;
-                        Audio audio = adapter.getItem(position);
+                        // Toggle selection state
+                        adapter.toggleSelection(position);
 
-                        if(selection.check.isChecked()) {
-                            selection.check.setSelection(false);
-                            audio.setMarked(false);
-                            temporary.remove(position);
-                        }else {
-                            selection.check.setSelection(true);
-                            audio.setMarked(true);
-                            temporary.add(position, audio);
+                        // Update the "select all" checkbox state
+                        AddSongs parentView = (AddSongs) getParent();
+                        if (parentView != null) {
+
                         }
                     }
-
                 });
                 setAdapter(adapter);
-
             }
 
             public void setTracks(ArrayList<Audio> tracks) {
@@ -665,10 +672,23 @@ public class AllPlaylists extends Slate {
             public ArrayList<Audio> getTracks() {
                 return tracks;
             }
+
+            public ArrayList<Audio> getSelectedTracks() {
+                return adapter.getSelectedTracks();
+            }
+
+            public void selectAll() {
+                adapter.selectAll();
+            }
+
+            public void clearSelections() {
+                adapter.clearSelections();
+            }
         }
 
         public ArrayList<Audio> playlist_tracks;
         RecyclerView.LayoutManager manager;
+        public AllPlaylists all_playlists;
         public Addlist addlist;
         private Image back;
         public Check check;
@@ -715,38 +735,34 @@ public class AllPlaylists extends Slate {
             super.onAttachedToWindow();
 
             check.setOnClickListener(new OnClickListener() {
-
                 private Background background;
-
                 private int shade;
 
                 {
                     background = check.getWallpaper();
                     shade = background.getShade();
-
                 }
+
                 @Override
                 public void onClick(View view) {
                     Check check = (Check) view;
 
-                    if(check.isChecked()) {
+                    if (check.isChecked()) {
                         check.setSelection(false);
-                        unmarkAll(addlist.tracks);
-                    }else {
+                        addlist.clearSelections();
+                    } else {
                         check.setSelection(true);
-                        markAll(addlist.tracks);
+                        addlist.selectAll();
                     }
                 }
             });
 
             done.setOnClickListener(new OnClickListener() {
-
                 @Override
                 public void onClick(View view) {
-                    AllPlaylists.create.setVisibility(VISIBLE);
+                    all_playlists.create.setVisibility(VISIBLE);
                     AddSongs.this.setVisibility(GONE);
                     setPlaylistTracks();
-
                 }
             });
 
@@ -754,35 +770,31 @@ public class AllPlaylists extends Slate {
 
                 @Override
                 public void onClick(View view) {
-                    create.setVisibility(VISIBLE);
+                    setPlaylistTracks();
+                    all_playlists.create.tracks = playlist_tracks;
+                    all_playlists.create.setVisibility(VISIBLE);
+                    Utils.debug("playlistall_playlists.create.tracks_tracks: " + playlist_tracks.size());
                     AddSongs.this.setVisibility(GONE);
+                    // TODO: 3/3/2025 remove from here after test
                 }
             });
 
         }
 
+        public AllPlaylists getAll_playlists() {
+            return all_playlists;
+        }
+
+        public void setAll_playlists(AllPlaylists all_playlists) {
+            this.all_playlists = all_playlists;
+        }
+
         private void markAll(ArrayList<Audio> tracks) {
-            for (int i = 0; i < tracks.size(); i++) {
-                tracks.get(i).setMarked(true);
-                addlist.temporary.add(tracks.get(i));
-            }
-            for (int i = 0; i < addlist.getChildCount(); i++) {
-                Selection selection = (Selection) addlist.getChildAt(i);
-                selection.check.setSelection(true);
-            }
+            addlist.selectAll();
         }
 
         private void unmarkAll(ArrayList<Audio> tracks) {
-
-            for (int i = 0; i < tracks.size(); i++) {
-                tracks.get(i).setMarked(false);
-                addlist.temporary.remove(tracks.get(i));
-            }
-
-            for (int i = 0; i < addlist.getChildCount(); i++) {
-                Selection selection = (Selection) addlist.getChildAt(i);
-                selection.check.setSelection(false);
-            }
+            addlist.clearSelections();
         }
 
         public ArrayList<Audio> getPlaylistTracks() {
@@ -790,17 +802,20 @@ public class AllPlaylists extends Slate {
         }
 
         public void setPlaylistTracks() {
-            this.playlist_tracks.addAll(addlist.temporary);
+            // Clear previous selections first
+            this.playlist_tracks.clear();
+            // Add newly selected tracks
+            this.playlist_tracks.addAll(addlist.getSelectedTracks());
         }
 
     }
 
-    public static Playlists.PlaylistTracks playlist_tracks;
-    public static CreatePlaylist create;
-    public static Playlists playlists;
-    public static AddSongs add_songs;
-    public static Options options;
-    public static Image add;
+    public Playlists.PlaylistTracks playlist_tracks;
+    public CreatePlaylist create;
+    public Playlists playlists;
+    public AddSongs add_songs;
+    public Options options;
+    public Image add;
 
     public AllPlaylists(@NonNull Context context) {
         super(context);
@@ -843,6 +858,18 @@ public class AllPlaylists extends Slate {
                 create.setVisibility(VISIBLE);
             }
         });
+
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+//                all_.contents.adapter.setAll_playlists(AllPlaylists.this);
+                playlists.setAll_playlists(AllPlaylists.this);
+                add_songs.setAll_playlists(AllPlaylists.this);
+                create.setAll_playlists(AllPlaylists.this);
+            }
+        });
+
     }
 
     public Playlists.PlaylistTracks getPlaylist_tracks() {
@@ -850,7 +877,7 @@ public class AllPlaylists extends Slate {
     }
 
     public void setPlaylist_tracks(Playlists.PlaylistTracks playlist_tracks) {
-        AllPlaylists.playlist_tracks = playlist_tracks;
+        playlist_tracks = playlist_tracks;
     }
 
     public CreatePlaylist getCreate() {
@@ -882,6 +909,7 @@ public class AllPlaylists extends Slate {
     }
 
     public void setOptions(Options options) {
-        AllPlaylists.options = options;
+        options = options;
     }
+
 }

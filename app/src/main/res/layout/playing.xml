@@ -98,7 +98,7 @@
             android:singleLine="true"
             tools:text="This is a very long song title that will scroll..."
             android:textStyle="bold"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
 
         <com.jaay.beats.uiviews.Text
             android:id="@+id/artist"
@@ -107,7 +107,7 @@
             android:layout_height="wrap_content"
 
             tools:text="Artist"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
 
         <com.jaay.beats.uiviews.Seekbar
             android:id="@+id/seek_bar"
@@ -129,7 +129,7 @@
             android:orientation="horizontal">
 
             <com.jaay.beats.uiviews.Text
-                android:id="@+id/start_time"
+                android:id="@+id/play_time"
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -139,12 +139,13 @@
 
             <com.jaay.beats.uiviews.Text
                 android:id="@+id/end_time"
-                android:layout_gravity="end"
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="4.08"
+                android:layout_gravity="end"
+
+                tools:text="4.08"
                 android:textColor="@color/black"/>
 
         </com.jaay.beats.uiviews.Slate>
@@ -157,11 +158,16 @@
             android:layout_gravity="center_horizontal">
 
             <com.jaay.beats.uiviews.Image
-                android:layout_width="40dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center_vertical"
+                android:id="@+id/repeat"
 
-                android:src="@drawable/playlist"
+                android:layout_width="50dp"
+                android:layout_height="40dp"
+
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
+
+                android:src="@drawable/repeat"
+                android:tint="#20000000"
                 />
 
             <com.jaay.beats.uiviews.Image
@@ -203,9 +209,10 @@
                 android:layout_height="40dp"
 
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="12dp"
 
-                android:src="@drawable/shuffle" />
+                android:src="@drawable/shuffle"
+                android:tint="#20000000"/>
 
         </LinearLayout>
 

@@ -10,6 +10,7 @@
 
 package com.jaay.beats.uiviews;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.media.RingtoneManager;
@@ -17,12 +18,14 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jaay.beats.R;
+import com.jaay.beats.tools.BlurUtils;
 import com.jaay.beats.types.Audio;
 
 import java.io.File;
@@ -31,6 +34,8 @@ public class Options extends Slate {
 
     public View add_favourite;
     public View set_ringtone;
+    public Stack options;
+    public View blocker;
     public View delete;
 
     public Options(@NonNull Context context) {
@@ -45,6 +50,8 @@ public class Options extends Slate {
 
         add_favourite = findViewById(R.id.add_favourite);
         set_ringtone = findViewById(R.id.set_ringtone);
+        options = findViewById(R.id.options_list);
+        blocker = findViewById(R.id.blocker);
         delete = findViewById(R.id.delete);
     }
 
@@ -56,12 +63,35 @@ public class Options extends Slate {
 
         add_favourite = findViewById(R.id.add_favourite);
         set_ringtone = findViewById(R.id.set_ringtone);
+        options = findViewById(R.id.options_list);
+        blocker = findViewById(R.id.blocker);
         delete = findViewById(R.id.delete);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        BlurUtils.blurViewBackground(blocker, 10F, 0.5F);
+        blocker.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                setVisibility(GONE);
+                return true;
+            }
+        });
+
+        options.setOnTouchListener(new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+    }
+
     public boolean delete(String path) {
-//        array.
-//        Arr
         File file = new File(path);
         return file.exists() && file.delete();
     }

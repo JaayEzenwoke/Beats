@@ -8,19 +8,14 @@
   ~        http://www.apache.org/licenses/LICENSE-2.0
   -->
 
-<com.jaay.beats.uiviews.Stack
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-
-    android:padding="10dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.jaay.beats.uiviews.Slate
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:orientation="horizontal"
 
         android:layout_marginBottom="10dp">
@@ -31,7 +26,9 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
 
-            android:src="@drawable/back"/>
+            android:src="@drawable/back"
+
+            android:tint="@color/beat_color"/>
 
         <com.jaay.beats.uiviews.Text
             android:id="@+id/select"
@@ -40,29 +37,32 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
 
-            android:text="select all"/>
+            android:text="select all"
+            android:textColor="@color/beat_color"/>
 
         <com.jaay.beats.uiviews.Check
             android:id="@+id/check"
 
-            android:layout_gravity="end"
             android:layout_width="30dp"
             android:layout_height="30dp"
+
+            android:layout_gravity="end"
             android:padding="4dp"
 
             android:src="@drawable/check"
+            android:tint="@color/white"
 
             app:stroke="@dimen/dp2"
-            app:stroke_shade="#60888888"
-            app:shade="#60888888"
+            app:stroke_shade="#FF38210A"
+            app:shade="#FF38210A"
             app:radius="10dp" />
 
     </com.jaay.beats.uiviews.Slate>
 
     <view
+        class="com.jaay.beats.reels.AllPlaylists$AddSongs$Addlist"
         android:id="@+id/addlist"
 
-        class="com.jaay.beats.reels.AllPlaylists$AddSongs$Addlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -71,15 +71,16 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:layout_margin="12dp"
         android:padding="7dp"
 
         android:textAlignment="center"
-        android:text="Done"
+        android:text="@string/done"
         android:textStyle="bold"
         android:textSize="20sp"
 
         app:shade="#60888888"
         app:radius="10dp" />
 
-</com.jaay.beats.uiviews.Stack>
+</merge>

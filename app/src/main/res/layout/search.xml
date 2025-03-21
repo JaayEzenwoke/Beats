@@ -46,18 +46,23 @@
         android:layout_height="match_parent"
 
         android:layout_marginTop="64dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp" />
+
+        android:visibility="gone"/>
 
     <com.jaay.beats.uiviews.Image
+        android:id="@+id/not_found"
+
         android:layout_width="150dp"
         android:layout_height="150dp"
 
         android:layout_gravity="center"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="0dp"
+
 
         android:src="@drawable/not_found"
-        android:backgroundTint="@color/beat_color"/>
+        android:backgroundTint="@color/beat_color"
+        android:tint="@color/beat_color"
+        android:visibility="gone"/>
 
 
 </com.jaay.beats.uiviews.Slate>

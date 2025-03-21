@@ -9,12 +9,12 @@
   ~        http://www.apache.org/licenses/LICENSE-2.0
   -->
 
-<com.jaay.beats.uiviews.Slate
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.jaay.beats.uiviews.Slate xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <View
         android:id="@+id/blocker"
@@ -22,170 +22,256 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:background="#20000000"/>
+        android:background="#60FFFFFF"/>
 
-    <com.jaay.beats.uiviews.Stack
+    <com.jaay.beats.uiviews.Slate
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_gravity="center_vertical"
-        android:layout_margin="35dp"
-        android:padding="25dp"
-
         android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:padding="10dp"
 
-        app:shade="#FF38210A"
-        app:radius="30dp">
+        app:reverse="true">
 
-        <com.jaay.beats.uiviews.Slate
-            android:id="@+id/delete"
-
+        <com.jaay.beats.uiviews.Stack
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
 
-            <com.jaay.beats.uiviews.Text
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:layout_marginBottom="-00dp"
 
-                android:text="@string/delete_song"
-                android:textSize="20sp"/>
+            app:shade="#FF38210A"
+            app:radius="25dp">
 
             <com.jaay.beats.uiviews.Image
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:layout_gravity="center_vertical|end"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
 
-                android:src="@drawable/delete"
-                />
-        </com.jaay.beats.uiviews.Slate>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@+id/options"
+                android:layout_gravity="center_vertical"
 
+                android:src="@drawable/logo_tptxdev"
+                android:scaleType="fitXY"
 
-            android:background="#40888888" />
-        <com.jaay.beats.uiviews.Slate
-            android:id="@+id/add_favourite"
+                app:radius="14dp"
+                app:shade="#FF888888"/>
 
-            android:layout_width="match_parent"
+            <com.jaay.beats.uiviews.Stack
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center_vertical">
+
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center_vertical"
+
+                    android:text="@string/title"
+                    android:textSize="18sp"
+                    android:textColor="@color/grey1"/>
+
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center_vertical"
+
+                    android:text="@string/artist"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"/>
+
+            </com.jaay.beats.uiviews.Stack>
+
+        </com.jaay.beats.uiviews.Stack>
+
+        <com.jaay.beats.uiviews.Stack
+            android:id="@+id/options_list"
+
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:padding="8dp">
 
-            <com.jaay.beats.uiviews.Text
-                android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical"
+            tools:layout_marginTop="70dp"
+            android:padding="12dp"
+
+            android:orientation="vertical"
+
+            app:shade="#FF38210A"
+            app:radius="25dp">
+
+            <com.jaay.beats.uiviews.Slate
+                android:id="@+id/delete"
+
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
 
-                android:text="@string/add_to_favourites"
-                android:textSize="20sp"/>
+                android:padding="8dp">
 
-            <com.jaay.beats.uiviews.Image
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:layout_gravity="center_vertical|end"
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
 
-                android:src="@drawable/like"
-                />
-        </com.jaay.beats.uiviews.Slate>
+                    android:text="@string/delete_song"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="@color/red1"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@+id/options"
+                <com.jaay.beats.uiviews.Image
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
 
-            android:background="#40888888" />
+                    android:layout_gravity="center_vertical|end"
 
-        <com.jaay.beats.uiviews.Slate
-            android:id="@+id/add_plalist"
+                    android:tint="@color/red"
+                    android:src="@drawable/delete" />
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp">
+            </com.jaay.beats.uiviews.Slate>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height=".5dp"
 
-            <com.jaay.beats.uiviews.Text
-                android:layout_width="wrap_content"
+                android:layout_below="@+id/options"
+
+
+                android:background="#40888888" />
+
+            <com.jaay.beats.uiviews.Slate
+                android:id="@+id/add_favourite"
+
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
 
-                android:text="@string/add_to_playlist"
-                android:textSize="20sp"/>
+                android:padding="8dp">
 
-            <com.jaay.beats.uiviews.Image
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:layout_gravity="center_vertical|end"
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
 
-                android:src="@drawable/add"
-                />
-        </com.jaay.beats.uiviews.Slate>
+                    android:text="@string/add_to_favourites"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@+id/options"
+                <com.jaay.beats.uiviews.Image
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:layout_gravity="center_vertical|end"
 
-            android:background="#40888888" />
+                    android:tint="@color/grey1"
+                    android:src="@drawable/like"
+                    />
+            </com.jaay.beats.uiviews.Slate>
 
-        <com.jaay.beats.uiviews.Slate
-            android:id="@+id/edit_track"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height=".5dp"
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp">
+                android:layout_below="@+id/options"
 
-            <com.jaay.beats.uiviews.Text
-                android:layout_width="wrap_content"
+                android:background="#40888888" />
+
+            <com.jaay.beats.uiviews.Slate
+                android:id="@+id/add_plalist"
+
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:padding="8dp">
 
-                android:text="@string/edit_song"
-                android:textSize="20sp"/>
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
 
-            <com.jaay.beats.uiviews.Image
-                android:layout_width="30sp"
-                android:layout_height="30sp"
+                    android:text="@string/add_to_playlist"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"/>
 
-                android:layout_gravity="center_vertical|end"
+                <com.jaay.beats.uiviews.Image
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:layout_gravity="center_vertical|end"
 
-                android:src="@drawable/edit_audio"
-                />
-        </com.jaay.beats.uiviews.Slate>
+                    android:tint="@color/grey1"
+                    android:src="@drawable/add"
+                    />
+            </com.jaay.beats.uiviews.Slate>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@+id/options"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height=".5dp"
+                android:layout_below="@+id/options"
 
-            android:background="#40888888" />
+                android:background="#40888888" />
 
+            <com.jaay.beats.uiviews.Slate
+                android:id="@+id/edit_track"
 
-        <com.jaay.beats.uiviews.Slate
-            android:id="@+id/set_ringtone"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp">
-
-            <com.jaay.beats.uiviews.Text
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:padding="8dp">
 
-                android:text="@string/set_as_ringtone"
-                android:textSize="20sp"/>
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
 
-            <com.jaay.beats.uiviews.Image
-                android:layout_width="30sp"
-                android:layout_height="30sp"
-                android:layout_gravity="center_vertical|end"
+                    android:text="@string/effect"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"/>
 
-                android:src="@drawable/ringtone"
-                />
-        </com.jaay.beats.uiviews.Slate>
+                <com.jaay.beats.uiviews.Image
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
 
-    </com.jaay.beats.uiviews.Stack>
+                    android:layout_gravity="center_vertical|end"
+
+                    android:tint="@color/grey1"
+                    android:src="@drawable/edit_audio"
+                    />
+            </com.jaay.beats.uiviews.Slate>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height=".5dp"
+                android:layout_below="@+id/options"
+
+                android:background="#40888888" />
+
+
+            <com.jaay.beats.uiviews.Slate
+                android:id="@+id/set_ringtone"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <com.jaay.beats.uiviews.Text
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+
+                    android:text="@string/set_as_ringtone"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"/>
+
+                <com.jaay.beats.uiviews.Image
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:layout_gravity="center_vertical|end"
+
+                    android:tint="@color/grey1"
+                    android:src="@drawable/ringtone"
+                    />
+            </com.jaay.beats.uiviews.Slate>
+
+        </com.jaay.beats.uiviews.Stack>
+
+    </com.jaay.beats.uiviews.Slate>
 
 </com.jaay.beats.uiviews.Slate>

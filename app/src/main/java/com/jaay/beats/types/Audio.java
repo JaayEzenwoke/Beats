@@ -24,6 +24,12 @@ public class Audio {
     private boolean selected;
     private boolean marked;
 
+    public Audio(Audio other) {
+        this.artist = other.artist;
+        this.title = other.title;
+        this.path = other.path;
+    }
+
     public Audio(String title, String path) {
         this.title = title;
         this.path = path;

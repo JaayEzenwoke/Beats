@@ -65,9 +65,7 @@
                     android:id="@+id/songs"
 
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-
-                    android:background="@color/black" />
+                    android:layout_height="match_parent" />
 
                 <com.jaay.beats.reels.Search
                     android:id="@+id/searches"
@@ -104,16 +102,6 @@
             android:layout_height="match_parent"
 
             android:visibility="invisible" />
-
-        <com.jaay.beats.uiviews.Options
-            android:id="@+id/options"
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            android:layout_gravity="center"
-
-            android:visibility="gone"/>
 
     </FrameLayout>
 
@@ -276,5 +264,15 @@
         </com.jaay.beats.uiviews.Stack>
 
     </LinearLayout>
+
+    <com.jaay.beats.uiviews.Options
+        android:id="@+id/options"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:layout_gravity="center"
+
+        android:visibility="gone"/>
 
 </FrameLayout>

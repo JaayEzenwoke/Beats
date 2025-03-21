@@ -28,41 +28,41 @@ import androidx.annotation.Nullable;
 import com.jaay.beats.R;
 import com.jaay.beats.tools.Utils;
 
-public class Seekbar extends View {
+public class Seekbar extends View implements Runnable{
 
     private MediaPlayer player;
     public Handler handler;
     public Runnable seeker;
     private Paint paint;
 
-    private float additions;
+    public float additions;
     private int seek_shade;
     private boolean dotted;
 
     public Seekbar(Context context) {
         super(context);
+        init();
     }
 
     public Seekbar(Context context, @Nullable AttributeSet attributes) {
         super(context, attributes);
         setBackground(getTile(context, attributes).getWalllpaper());
+        init();
         initialize(context, attributes);
     }
 
     public Seekbar(Context context, @Nullable AttributeSet attributes, int style) {
         super(context, attributes, style);
         setBackground(getTile(context, attributes).getWalllpaper());
+        init();
         initialize(context, attributes);
     }
 
-    {
+    private void init() {
         handler = new Handler();
-        paint = new Paint() {
-            {
-                setAntiAlias(true);
-                setColor(seek_shade);
-            }
-        };
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(seek_shade != 0 ? seek_shade : Color.WHITE);
     }
 
     public void initialize(Context context, @Nullable AttributeSet attributes) {
@@ -84,29 +84,37 @@ public class Seekbar extends View {
 
             @Override
             public boolean onTouch(View view, MotionEvent event) {
+                if (player == null) return false;
+
                 float px = event.getX();
+                // Constrain to view bounds
+                px = Math.max(0, Math.min(px, getWidth()));
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
                         additions = px;
                         invalidate();
-                        
-                    }break;
+                        return true;
+                    }
                     case MotionEvent.ACTION_MOVE: {
                         additions = px;
-                        int time;
                         invalidate();
-                    }break;
+                        return true;
+                    }
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_UP: {
                         additions = px;
-                        int duration = player.getDuration() / 1000;
-                        int position = (int) (additions * duration);
-                        player.seekTo(position);
+                        // Calculate the seek position as a proportion of the view width
+                        float proportion = px / getWidth();
+                        int seekPosition = (int) (player.getDuration() * proportion);
+
+                        // Seek the media player
+                        player.seekTo(seekPosition);
                         invalidate();
-                    }break;
+                        return true;
+                    }
                 }
-                return true;
+                return false;
             }
         });
     }
@@ -128,55 +136,60 @@ public class Seekbar extends View {
         width = width - padding_left - padding_right;
         height = height - padding_top - padding_bottom;
 
+        // Ensure additions is within bounds
+        additions = Math.max(padding_left, Math.min(additions, width));
 
         if(dotted) {
             float offset = height / 5F;
 
-            paint.setColor(Utils.getTransluscency(seek_shade, 32));
-            canvas.drawRoundRect(padding_left, offset, width, (padding_top + height) - offset,  circle_width, circle_width, paint);
+            paint.setColor(Utils.getTransluscency(seek_shade, 0x20));
+            canvas.drawRoundRect(padding_left, offset, width, (padding_top + height) - offset, circle_width, circle_width, paint);
 
-            paint.setColor(Utils.getTransluscency(seek_shade, 128));
-            canvas.drawRoundRect(padding_left, offset, additions, (padding_top + height) - offset,  height / 2F, height, paint);
+            paint.setColor(Utils.getTransluscency(seek_shade, 0x80));
+            canvas.drawRoundRect(padding_left, offset, additions, (padding_top + height) - offset, height / 2F, height, paint);
 
             paint.setColor(seek_shade);
-            float cx = additions > (circle_width / 2F) ? ((additions - (circle_width / 2F))) : 0;
+
+            float cx = additions > (circle_width / 2F) ? (additions - (circle_width / 2F)) : padding_left;
+            cx = Math.max(padding_left, Math.min(cx, width - padding_right - circle_width));
+
             canvas.drawRoundRect(cx, 0, cx + circle_width, circle_width, circle_width, circle_width, paint);
-        }else {
+        } else {
+            // Draw background track
+            paint.setColor(Utils.getTransluscency(seek_shade, 0x20));
+            canvas.drawRoundRect(padding_left, padding_top, width, padding_top + height, height/2, height/2, paint);
+
+            // Draw progress track
             paint.setColor(seek_shade);
-            canvas.drawRoundRect(padding_left, padding_top, additions, padding_top + height,  0, 0, paint);
+            canvas.drawRoundRect(padding_left, padding_top, additions, padding_top + height, height/2, height/2, paint);
         }
     }
 
-    public void setAdditions(int time) {
-        if (time < 1) return;
-        float unit = (float) getWidth() / time;
-
-        seeker = new Runnable() {
-
-            @Override
-            public void run() {
-
-                if (additions < getWidth()) {
-                    additions += unit;
-                    invalidate();
-                    handler.postDelayed(this, 1000);
-                }else {
-                    additions = 0;
-                    invalidate();
-                }
-
-            }
-        };
-
-        handler.post(seeker);
+    // This method is now used differently - the playing class controls the seeking
+    public void setAdditions(float duration) {
+        // Store the duration for calculations
+        if (player != null) {
+            // This is simply initializing the seekbar for a new track
+            additions = 0;
+            invalidate();
+        }
     }
 
     public void pause(float current_position) {
-        handler.removeCallbacks(seeker);
+        // Convert position from 0-1 to pixel coordinates
+        additions = current_position * getWidth();
+        invalidate();
+
+        // Remove any automatic updates
+        if (handler != null && seeker != null) {
+            handler.removeCallbacks(seeker);
+        }
     }
 
     public void seekTo(int position) {
-
+        if (player != null) {
+            player.seekTo(position);
+        }
     }
 
     public MediaPlayer getPlayer() {
@@ -185,5 +198,10 @@ public class Seekbar extends View {
 
     public void setPlayer(MediaPlayer player) {
         this.player = player;
+    }
+
+    @Override
+    public void run() {
+        // This method is not used anymore - the Playing class handles the updates
     }
 }

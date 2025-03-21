@@ -46,11 +46,11 @@ public class Beat {
 
     private volatile boolean ispaused;
 
-    private MediaExtractor extractor;
+    private final MediaExtractor extractor;
+    private final ArrayList<Audio> tracks;
     private MediaCodec decoder;
     private AudioTrack track;
     private Context context;
-    private ArrayList<Audio> tracks;
 
     public Beat(Context context) {
         this.context = context;
@@ -126,96 +126,7 @@ public class Beat {
                 AudioManager.AUDIO_SESSION_ID_GENERATE
         );
     }
-
-//    private void playAudio(String filePath) {
-//        MediaExtractor extractor = new MediaExtractor();
-//        MediaCodec codec = null;
-//        AudioTrack audioTrack = null;
-//
-//        try {
-//            extractor.setDataSource(filePath);
-//
-//            MediaFormat format = null;
-//            for (int i = 0; i < extractor.getTrackCount(); i++) {
-//                format = extractor.getTrackFormat(i);
-//                String mime = format.getString(MediaFormat.KEY_MIME);
-//                if (mime.startsWith("audio/")) {
-//                    extractor.selectTrack(i);
-//                    break;
-//                }
-//            }
-//
-//            codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME));
-//            codec.configure(format, null, null, 0);
-//            codec.start();
-//
-//            int bufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT);
-//            audioTrack = new AudioTrack(
-//                    AudioManager.STREAM_MUSIC,
-//                    SAMPLE_RATE,
-//                    CHANNEL_CONFIG,
-//                    AUDIO_FORMAT,
-//                    bufferSize,
-//                    AudioTrack.MODE_STREAM
-//            );
-//            audioTrack.play();
-//
-//            ByteBuffer[] inputBuffers = codec.getInputBuffers();
-//            ByteBuffer[] outputBuffers = codec.getOutputBuffers();
-//            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-//
-//            boolean isEOS = false;
-//            long timeoutUs = 10000;
-//
-//            while (!isEOS) {
-//                int inIndex = codec.dequeueInputBuffer(timeoutUs);
-//                if (inIndex >= 0) {
-//                    ByteBuffer buffer = inputBuffers[inIndex];
-//                    int sampleSize = extractor.readSampleData(buffer, 0);
-//                    if (sampleSize < 0) {
-//                        codec.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-//                        isEOS = true;
-//                    } else {
-//                        codec.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
-//                        extractor.advance();
-//                    }
-//                }
-//
-//                int outIndex = codec.dequeueOutputBuffer(info, timeoutUs);
-//                switch (outIndex) {
-//                    case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-//                        outputBuffers = codec.getOutputBuffers();
-//                        break;
-//                    case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-//                        MediaFormat newFormat = codec.getOutputFormat();
-//                        audioTrack.setPlaybackRate(newFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE));
-//                        break;
-//                    case MediaCodec.INFO_TRY_AGAIN_LATER:
-//                        break;
-//                    default:
-//                        ByteBuffer outBuffer = outputBuffers[outIndex];
-//                        final byte[] chunk = new byte[info.size];
-//                        outBuffer.get(chunk);
-//                        outBuffer.clear();
-//                        audioTrack.write(chunk, 0, chunk.length);
-//                        codec.releaseOutputBuffer(outIndex, false);
-//                        break;
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (codec != null) {
-//                codec.stop();
-//                codec.release();
-//            }
-//            if (audioTrack != null) {
-//                audioTrack.stop();
-//                audioTrack.release();
-//            }
-//            extractor.release();
-//        }
-//    }
+    
 
     // Play audio from the given file path
     public void play(String path) {
@@ -227,12 +138,79 @@ public class Beat {
                 decodeAndPlay(path);
             }
         });
-
-        Map<String, String> testMap = new HashMap<>();
-        testMap.put("test", "test");
     }
 
-    // Decode and play audio simultaneously
+//    // Decode and play audio simultaneously
+//    private void decodeAndPlay(String path) {
+//        try {
+//            extractor.setDataSource(path);
+//            int track_index = selectTrack();
+//            if (track_index == -1) return;
+//
+//            MediaFormat format = extractor.getTrackFormat(track_index);
+//            String mime = format.getString(MediaFormat.KEY_MIME);
+//            int sample_rate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+//            int channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+//            int configuration = channels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO;
+//
+//            decoder = MediaCodec.createDecoderByType(mime);
+//            decoder.configure(format, null, null, 0);
+//            track = initialize(sample_rate, configuration);
+//            decoder.start();
+//
+//            track.play();
+//
+//            ByteBuffer input;
+//            ByteBuffer output;
+//            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+//            boolean isEOS = false;
+//
+//            while (!Thread.interrupted()) {
+//                if (ispaused) {
+//                    Thread.sleep(100); // Sleep to avoid busy waiting when paused
+//                    continue;
+//                }
+//
+//                if (!isEOS) {
+//                    int inputBufferIndex = decoder.dequeueInputBuffer(10000);
+//                    if (inputBufferIndex >= 0) {
+//                        input = decoder.getInputBuffer(inputBufferIndex);
+//                        int size = extractor.readSampleData(input, 0);
+//
+//                        if (size < 0) {
+//                            decoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+//                            isEOS = true;
+//                        } else {
+//                            decoder.queueInputBuffer(inputBufferIndex, 0, size, extractor.getSampleTime(), 0);
+//                            extractor.advance();
+//                        }
+//                    }
+//                }
+//
+//                int buffer = decoder.dequeueOutputBuffer(info, 10000);
+//                if (buffer >= 0) {
+//                    output = decoder.getOutputBuffer(buffer);
+//                    byte[] chunk = new byte[info.size];
+//                    output.get(chunk);
+//                    output.clear();
+//
+//                    if (chunk.length > 0) {
+//                        track.write(chunk, 0, chunk.length);
+//                    }
+//                    decoder.releaseOutputBuffer(buffer, false);
+//
+//                    if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+//                        break;
+//                    }
+//                }
+//            }
+//        } catch (IOException | InterruptedException exception) {
+//            Log.e(TAG, "Error in decodeAndPlay: " + exception.getMessage());
+//        } finally {
+//            cleanUp(track, decoder, extractor);
+//        }
+//    }
+
     private void decodeAndPlay(String path) {
         try {
             extractor.setDataSource(path);
@@ -247,10 +225,9 @@ public class Beat {
 
             decoder = MediaCodec.createDecoderByType(mime);
             decoder.configure(format, null, null, 0);
-
             track = initialize(sample_rate, configuration);
-
             decoder.start();
+
             track.play();
 
             ByteBuffer input;
@@ -258,9 +235,15 @@ public class Beat {
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             boolean isEOS = false;
 
+            // FFT setup
+            int fftSize = 1024; // Choose a power of 2
+            FFT fft = new FFT(fftSize);
+            double[] real = new double[fftSize];
+            double[] imag = new double[fftSize];
+
             while (!Thread.interrupted()) {
                 if (ispaused) {
-                    Thread.sleep(100); // Sleep to avoid busy waiting when paused
+                    Thread.sleep(100);
                     continue;
                 }
 
@@ -288,7 +271,13 @@ public class Beat {
                     output.clear();
 
                     if (chunk.length > 0) {
-                        track.write(chunk, 0, chunk.length);
+                        // Convert PCM bytes to floating-point samples
+                        short[] pcmSamples = Utils.byteArrayToShortArray(chunk);
+                        Utils.processWithFFT(pcmSamples, fft, real, imag);
+
+                        // Convert back to bytes after processing
+                        byte[] processedChunk = Utils.shortArrayToByteArray(pcmSamples);
+                        track.write(processedChunk, 0, processedChunk.length);
                     }
                     decoder.releaseOutputBuffer(buffer, false);
 
@@ -313,7 +302,7 @@ public class Beat {
     }
 
     // Resume audio playback
-    public void resume() {
+    public void play() {
         ispaused = false;
         if (track != null) {
             track.play();

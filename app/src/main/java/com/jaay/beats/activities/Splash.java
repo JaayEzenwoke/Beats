@@ -10,10 +10,13 @@
 
 package com.jaay.beats.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,6 +25,7 @@ import com.jaay.beats.R;
 import com.jaay.beats.concurrency.Runner;
 import com.jaay.beats.playground.Debbugger;
 import com.jaay.beats.playground.TestActivity;
+import com.jaay.beats.tools.Utils;
 import com.jaay.beats.types.Playlist;
 
 import java.io.File;
@@ -33,11 +37,28 @@ public class Splash extends Beats {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        checkAndRequestPermissions();
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        super.onRequestPermissionsResult(requestCode, permissions, results);
+
+        // Check if our permission request was granted
+        if (requestCode == 1) {
+            if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
+                setUp();
+            }
+        }
+    }
+
+    public void setUp() {
+        // Permission was granted, set up the player
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         Runner runner = new Runner();
         runner.setData(this);
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable(){
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
 
             @Override
             public void run() {
@@ -50,4 +71,40 @@ public class Splash extends Beats {
             }
         }, 1200);
     }
+
+    private void checkAndRequestPermissions() {
+        // Check if we already have the necessary permissions
+        if (Utils.checkPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                Utils.checkPermission(this, Manifest.permission.READ_MEDIA_AUDIO)) {
+            // We have permission, proceed with setup
+            setUp();
+        } else {
+            // We don't have permission, request it
+            Utils.requestPermission(this);
+        }
+    }
+
+//    private void showPermissionDeniedMessage() {
+//        // Create and show an alert dialog
+//        new AlertDialog.Builder(this)
+//                .setTitle("Permission Required")
+//                .setMessage("Storage permission is required to access music files. Without this permission, the app cannot function properly.")
+//                .setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // Try requesting permission again
+//                        Utils.requestPermission(Splash.this);
+//                    }
+//                })
+//                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // Close the app
+//                        finish();
+//                    }
+//                })
+//                .setCancelable(false)
+//                .show();
+
+
 }

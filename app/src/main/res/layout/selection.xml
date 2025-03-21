@@ -12,7 +12,9 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:orientation="vertical"
+        android:layout_marginRight="6dp"
 
         android:layout_toStartOf="@+id/check">
 
@@ -44,15 +46,18 @@
 
         android:layout_width="30dp"
         android:layout_height="30dp"
+
         android:layout_alignParentEnd="true"
         android:layout_centerInParent="true"
+
+        android:tint="@color/white"
 
         android:padding="4dp"
 
         app:radius="10dp"
-        app:shade="#60888888"
+        app:shade="#FF38210A"
         app:stroke="@dimen/dp2"
-        app:stroke_shade="#60888888" />
+        app:stroke_shade="#FF38210A" />
 
     <View
         android:id="@+id/separator"

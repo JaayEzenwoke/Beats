@@ -41,7 +41,7 @@ public class Playlist {
     }
 
     public int getSongCount() {
-        return songs_count;
+        return tracks.size();
     }
 
     public void setSongCount(int songs_count) {

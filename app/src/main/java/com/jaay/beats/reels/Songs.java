@@ -10,20 +10,14 @@
 
 package com.jaay.beats.reels;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,9 +26,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jaay.beats.R;
-import com.jaay.beats.tools.Utils;
+import com.jaay.beats.activities.Beats;
 import com.jaay.beats.types.Audio;
 import com.jaay.beats.types.Playlist;
+import com.jaay.beats.uiviews.Dots;
+import com.jaay.beats.uiviews.Options;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,8 +49,9 @@ public class Songs extends RecyclerView {
 
     public static class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
 
-        public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public class Holder extends RecyclerView.ViewHolder {
 
+            public Dots options;
             public TextView title;
             public View separator;
             public TextView song;
@@ -65,33 +62,47 @@ public class Songs extends RecyclerView {
                 separator = view.findViewById(R.id.separator);
                 title = view.findViewById(R.id.title);
                 song = view.findViewById(R.id.song);
+                options = view.findViewById(R.id.options);
 
-                view.setOnClickListener(this);
-            }
+                view.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-                if (listener != null) listener.onClick(view, getAdapterPosition());
+                    @Override
+                    public void onClick(View view) {
 
-                // Store previous selection
-                int previous_position = selected_position;
+                        if (listener != null) listener.onClick(view, getAdapterPosition());
 
-                // Update selected position
-                selected_position = getAdapterPosition();
+                        // Store previous selection
+                        int previous_position = selected_position;
 
-                // Notify changes to update UI
-                notifyItemChanged(previous_position);
-                notifyItemChanged(selected_position);
+                        // Update selected position
+                        selected_position = getAdapterPosition();
+
+                        // Notify changes to update UI
+                        notifyItemChanged(previous_position);
+                        notifyItemChanged(selected_position);
+                    }
+                });
+
+                view.setOnLongClickListener(new OnLongClickListener() {
+
+                    @Override
+                    public boolean onLongClick(View view) {
+                        if (listener != null) listener.onLongClick(view, getAdapterPosition());
+                        return true;
+                    }
+                });
+
             }
         }
 
         public interface Listener {
             void onClick(View view, int position);
+            void onLongClick(View view, int position);
         }
 
         private LayoutInflater inflater;
-        private ArrayList<Audio> tracks;
-        private ArrayList<Audio> recent;
+        public ArrayList<Audio> tracks;
+        public ArrayList<Audio> recent;
         private Listener listener;
 
         private int selected_position = RecyclerView.NO_POSITION;
@@ -153,50 +164,23 @@ public class Songs extends RecyclerView {
         }
     }
 
+    public static int mode;
+
     private Playing.NowPlaying now_playing;
     private Playing playing;
 
-
-    private AudioManager audioManager;
     public ArrayList<Audio> tracks;
     private MediaPlayer player;
     private Activity activity;
-    private Adapter adapter;
+    public Adapter adapter;
     private Audio previous;
     private Audio current;
     private Audio next;
 
     private int current_position;
     private int previous_position;
-    private int mode;
     
     boolean is_playing;
-
-    private AudioManager.OnAudioFocusChangeListener focusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int focusChange) {
-            switch (focusChange) {
-                case AudioManager.AUDIOFOCUS_LOSS:
-                    // Another app has taken audio focus permanently (e.g., another music player)
-                    stopMediaPlayer();
-                    break;
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                    // Temporarily lost audio focus (e.g., incoming call)
-                    pauseMediaPlayer();
-                    break;
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    // Lower volume if another app (like a notification) is playing audio
-                    if (player != null) {
-                        player.setVolume(0.3f, 0.3f);
-                    }
-                    break;
-                case AudioManager.AUDIOFOCUS_GAIN:
-                    // Regained audio focus, resume playback
-                    resumeMediaPlayer();
-                    break;
-            }
-        }
-    };
 
     public Songs(@NonNull Context context) {
         super(context);
@@ -217,96 +201,12 @@ public class Songs extends RecyclerView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-
-        adapter.setClickListener(new Adapter.Listener() {
-
-            @Override
-            public void onClick(View view, int position) {
-                if(position < 0) return;
-
-                setCurrentPosition(position);
-                Audio audio = adapter.getItem(position);
-                playAudio(audio);
-                getPlaying().setVisibility(VISIBLE);
-                getNow_playing().initialize();
-
-                getPlaying().setSongs(Songs.this);
-
-                if(position > 0) {
-                    setPrevious(adapter.getItem(position - 1));
-                }
-
-                setCurrent(audio);
-                if (adapter.tracks.size() > position) {
-                    setNext(adapter.getItem(position + 1));
-                }
-
-                getNow_playing().setTitle(audio.getTitle(), audio.getArtist());
-
-                getPlaying().initialize();
-                getPlaying().setTitle(audio.getTitle(), audio.getArtist());
-
-                if (Utils.getImage(getContext(), getCurrent().getPath()) == null) {
-                    getNow_playing().track_thumbnail.setImage(R.drawable.disc_icon);
-                    getPlaying().thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    getPlaying().thumbnail.setImage(R.drawable.disc_icon);
-                }else {
-                    Utils.setImage(getContext(), getCurrent().getPath(), getPlaying().thumbnail);
-                    getNow_playing().setImage(getContext(), getCurrent().getPath());
-                }
-
-
-                adapter.setSelectedPosition(position);
-                is_playing = true;
-                
-            }
-        });
     }
 
-    public void initialize(Context context) {
-        tracks = getTracks(context);
+    public void initialize(Beats context) {
         setLayoutManager(new LinearLayoutManager(context));
         adapter = new Adapter(context, tracks);
         setAdapter(adapter);
-    }
-
-    @SuppressLint("Range")
-    private ArrayList<Audio> getTracks(Context context) {
-        ArrayList<Audio> tracks = new ArrayList<>();
-        ContentResolver contentResolver = context.getContentResolver();
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = {
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.DATE_ADDED
-        };
-
-        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String date_added = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
-                String artist     = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String title      = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String path       = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-
-                Audio audio = new Audio(artist, title, path);
-                audio.setDate(date_added);
-                tracks.add(audio);
-            }
-            cursor.close();
-            Collections.sort(tracks, new Comparator<Audio>() {
-                @Override
-                public int compare(Audio track_1, Audio track_2) {
-                    return track_1.getTitle().compareTo(track_2.getTitle());
-                }
-            });
-
-            return tracks;
-        } else {
-            return tracks;
-        }
     }
 
     public Playlist recentlyAdded(Context context) {
@@ -343,51 +243,21 @@ public class Songs extends RecyclerView {
         } catch (IOException exception) {
 
         }
-
-        audioManager = (AudioManager)  getActivity().getSystemService(Context.AUDIO_SERVICE);
-        int result = audioManager.requestAudioFocus(focusChangeListener,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN);
-
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            player.start();
-        }
-
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-            @Override
-            public void onCompletion(MediaPlayer player) {
-                switch (mode) {
-                    case Mode.repeat_current: {
-                        repeatCurrent();
-                    }break;
-                    case Mode.repeat_all: {
-                        repeatAll();
-                    }break;
-                    case Mode.shuffle: {
-                        shuffle();
-                    }break;
-                    case Mode.all: {
-                        playNext();
-                    }break;
-                }
-            }
-        });
     }
 
-    private void pauseMediaPlayer() {
+    public void pauseMediaPlayer() {
         if (player != null && player.isPlaying()) {
             player.pause();
         }
     }
 
-    private void releaseAudioFocus() {
-        if (audioManager != null) {
-            audioManager.abandonAudioFocus(focusChangeListener);
+    public void releaseAudioFocus(AudioManager manager, AudioManager.OnAudioFocusChangeListener listener) {
+        if (manager != null) {
+            manager.abandonAudioFocus(listener);
         }
     }
 
-    private void resumeMediaPlayer() {
+    public void resumeMediaPlayer() {
         if (!is_playing) return;
         if (player != null) {
             player.setVolume(1.0f, 1.0f); // Restore volume
@@ -395,71 +265,20 @@ public class Songs extends RecyclerView {
         }
     }
 
-    private void stopMediaPlayer() {
+    public void stopMediaPlayer(AudioManager manager, AudioManager.OnAudioFocusChangeListener listener) {
         if (player != null) {
             player.stop();
             player.release();
             player = null;
         }
-        releaseAudioFocus();
-    }
-
-    public void repeatCurrent() {
-        int current = getCurrentPosition();
-        Audio audio = adapter.getItem(current);
-        playAudio(audio);
-        getNow_playing().initialize();
-        getPlaying().initialize();
-        setCurrentPosition(current);
-    }
-
-    private void repeatAll() {
-        int current = getCurrentPosition();
-        current++;
-        if (current < adapter.getItemCount()) {
-            Audio audio = adapter.getItem(current);
-            playAudio(audio);
-            getNow_playing().initialize();
-            getPlaying().initialize();
-        } else {
-            current = 0;
-            playAudio(adapter.getItem(current));
-        }
-        setCurrentPosition(current);
-    }
-
-    private void shuffle() {
-        int current = getCurrentPosition();
-        int max = adapter.getItemCount();
-        Audio audio = adapter.getItem(current);
-        playAudio(audio);
-        getNow_playing().initialize();
-        getPlaying().initialize();
-        setCurrentPosition(getRandom(0, max));
-    }
-
-    public void playNext() {
-        int current = getCurrentPosition();
-        current++;
-        if (current < adapter.getItemCount()) {
-            Audio audio = adapter.getItem(current);
-            playAudio(audio);
-            getNow_playing().initialize();
-            getPlaying().initialize();
-        } else {
-            player.reset();
-        }
-        setCurrentPosition(current);
+        releaseAudioFocus(manager, listener);
     }
 
     public void playPrev() {
         int current = getCurrentPosition();
         current--;
         if (current > -1) {
-            Audio audio = adapter.getItem(current);
-            playAudio(audio);
-            getNow_playing().initialize();
-            getPlaying().initialize();
+            getPlaying().initialize(current, tracks);
         } else {
             player.reset();
         }
@@ -543,7 +362,11 @@ public class Songs extends RecyclerView {
         return previous_position;
     }
 
-    public void setMode(int mode) {
-        this.mode = mode;
+    public static void setMode(int set_mode) {
+        mode = set_mode;
+    }
+
+    public static int getMode() {
+        return mode;
     }
 }

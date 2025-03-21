@@ -6,7 +6,7 @@
     <string name="search">Search</string>
     <string name="playlists">Playlists</string>
     <string name="search_in_library">Search in Library</string>
-    <string name="choose_a_name_for_your_playlist">choose a name for your playlist</string>
+    <string name="choose_a_name_for_your_playlist">name</string>
     <string name="name">Name</string>
     <string name="_0_songs_added">0 songs added</string>
     <string name="add_songs">Add Songs</string>
@@ -15,7 +15,14 @@
     <string name="edit_song">edit song</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="delete_song">delete song</string>
+    <string name="title">Title</string>
+    <string name="artist">Artist</string>
+    <string name="album">album</string>
     <string name="now_playing">now playing</string>
     <string name="all_songs">All Songs</string>
     <string name="create_a_playlist">Create a Playlist</string>
+    <string name="done">Done</string>
+    <string name="effect">Add effects</string>
+
+
 </resources>

@@ -10,23 +10,37 @@
 
 package com.jaay.beats.tools;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.jaay.beats.R;
+import com.jaay.beats.activities.Beats;
+import com.jaay.beats.core.FFT;
 import com.jaay.beats.design.Background;
 import com.jaay.beats.types.Audio;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 
 public class Utils {
@@ -137,7 +151,7 @@ public class Utils {
         return (alpha << 24) | (shade & 0x00FFFFFF); // Apply new alpha while keeping RGB
     }
 
-    public static void setImage (Context context, String path, ImageView thumbnail) {
+    public static Bitmap setImage (Context context, String path, ImageView thumbnail) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(context, Uri.parse(path));
 
@@ -145,6 +159,7 @@ public class Utils {
         if (artwork != null) {
             Bitmap bitmap = BitmapFactory.decodeByteArray(artwork, 0, artwork.length);
             thumbnail.setImageBitmap(bitmap);
+            return bitmap;
         }
 
         try {
@@ -152,6 +167,7 @@ public class Utils {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+        return null;
     }
 
     public static byte[] getImage (Context context, String path) {
@@ -163,4 +179,141 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public  static boolean checkPermission(Beats beats, String permission) {
+        int result = ContextCompat.checkSelfPermission(beats, permission);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public  static void requestPermission(Beats beats) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+            ActivityCompat.requestPermissions(beats, new String[]{Manifest.permission.READ_MEDIA_AUDIO}, 1);
+        } else {
+            ActivityCompat.requestPermissions(beats, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+    }
+
+    public static ArrayList<Audio> getTracks(Beats context) {
+        ArrayList<Audio> tracks =  new ArrayList<>();
+
+        Utils.debug("checkPermission");
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String[] projection = {
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.DATE_ADDED
+        };
+
+        // Add some debugging
+        Utils.debug("Starting query for audio files");
+
+        try {
+            Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+
+            Utils.debug("Cursor returned: " + (cursor != null ? "not null" : "null"));
+            if (cursor != null) {
+                Utils.debug("Cursor count: " + cursor.getCount());
+
+                int titleIdx = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
+                int dataIdx = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+                int artistIdx = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
+                int dateIdx = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED);
+
+                while (cursor.moveToNext()) {
+                    String date_added = cursor.getString(dateIdx);
+                    String artist = cursor.getString(artistIdx);
+                    String title = cursor.getString(titleIdx);
+                    String path = cursor.getString(dataIdx);
+
+                    Audio audio = new Audio(artist, title, path);
+                    audio.setDate(date_added);
+                    tracks.add(audio);
+                }
+                cursor.close();
+            }
+        } catch (Exception e) {
+            Utils.debug("Error querying media: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return tracks;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String abbreviateNumber(long value) {
+        if (value < 1000) {
+            return String.valueOf(value);
+        } else if (value < 1_000_000) {
+            return String.format("%.1fK", value / 1000.0);
+        } else if (value < 1_000_000_000) {
+            return String.format("%.1fM", value / 1_000_000.0);
+        } else if (value < 1_000_000_000_000L) {
+            return String.format("%.1fB", value / 1_000_000_000.0);
+        } else {
+            return String.format("%.1fT", value / 1_000_000_000_000.0);
+        }
+    }
+
+    public static byte[] shortArrayToByteArray(short[] data) {
+        ByteBuffer buffer = ByteBuffer.allocate(data.length * 2).order(ByteOrder.LITTLE_ENDIAN);
+        buffer.asShortBuffer().put(data);
+        return buffer.array();
+    }
+
+    public static short[] byteArrayToShortArray(byte[] data) {
+        int length = data.length / 2;
+        short[] result = new short[length];
+        ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(result);
+        return result;
+    }
+
+    public static void processWithFFT(short[] samples, FFT fft, double[] real, double[] imag) {
+        int fftSize = real.length;
+        int numFrames = samples.length / fftSize;
+
+        for (int frame = 0; frame < numFrames; frame++) {
+            // Convert PCM to floating-point values
+            for (int i = 0; i < fftSize; i++) {
+                real[i] = samples[frame * fftSize + i] / 32768.0; // Normalize to [-1, 1]
+                imag[i] = 0; // No imaginary part
+            }
+
+            // Perform FFT
+            fft.fft(real, imag);
+
+            // Spectral Subtraction (Reduce Noise)
+            for (int i = 0; i < fftSize / 2; i++) {
+                double magnitude = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
+
+                // Noise thresholding
+                if (magnitude < 0.01) { // Adjust noise floor threshold
+                    real[i] = 0;
+                    imag[i] = 0;
+                }
+            }
+
+            // Perform Inverse FFT
+            fft.ifft(real, imag);
+
+            // Convert back to PCM
+            for (int i = 0; i < fftSize; i++) {
+                samples[frame * fftSize + i] = (short) Math.max(-32768, Math.min(32767, real[i] * 32768)); // Convert back to 16-bit
+            }
+        }
+    }
+
+    public static String formatTime(int milliseconds) {
+        int seconds = milliseconds / 1000;
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+
+        return String.format("%d:%02d", minutes, remainingSeconds);
+    }
+
 }

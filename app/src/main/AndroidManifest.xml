@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+
 
     <application
         android:allowBackup="true"
@@ -46,11 +48,7 @@
             android:name=".playground.TestActivity"
             android:exported="true" />
 
-        <service
-            android:name=".important.BackgroundService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
-
+<!--        <servic/>-->
     </application>
 
 

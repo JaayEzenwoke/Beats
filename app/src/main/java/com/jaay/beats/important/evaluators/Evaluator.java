@@ -39,8 +39,6 @@ public class Evaluator<T extends Object> implements TypeEvaluator<T> {
         T start = values[current_segment];
         T end = values[current_segment + 1];
 
-        Utils.debug("value " + evaluate(time, start, end));
-
         return evaluate(time, start, end);
     }
 

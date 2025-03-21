@@ -10,18 +10,17 @@
 
 package com.jaay.beats.activities;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
@@ -29,16 +28,17 @@ import android.widget.TextView;
 
 import com.jaay.beats.R;
 import com.jaay.beats.concurrency.Runner;
+import com.jaay.beats.core.Beat;
 import com.jaay.beats.reels.AllPlaylists;
 import com.jaay.beats.reels.Favourites;
 import com.jaay.beats.reels.Playing;
 import com.jaay.beats.reels.Search;
 import com.jaay.beats.reels.Songs;
 import com.jaay.beats.tools.Utils;
+import com.jaay.beats.types.Audio;
 import com.jaay.beats.uiviews.Image;
 import com.jaay.beats.uiviews.Stack;
 import com.jaay.beats.uiviews.Options;
-import com.jaay.beats.uiviews.Text;
 
 import java.util.ArrayList;
 
@@ -49,6 +49,7 @@ public class Base extends Beats {
     private AllPlaylists playlists;
     private Favourites favourites;
     private Stack search_button;
+    private MediaPlayer player;
     private LinearLayout tab;
     private Search searches;
     private Options options;
@@ -68,18 +69,101 @@ public class Base extends Beats {
     private TextView search_text;
     private TextView home_text;
 
-    int margin;
+
+    private AudioManager manager;
 
 
+    private final AudioManager.OnAudioFocusChangeListener audio_listener = new AudioManager.OnAudioFocusChangeListener() {
 
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    // Another app has taken audio focus permanently (e.g., another music player)
+                    songs.stopMediaPlayer(manager, this);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    // Temporarily lost audio focus (e.g., incoming call)
+                    songs.pauseMediaPlayer();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Lower volume if another app (like a notification) is playing audio
+                    if (player != null) {
+                        player.setVolume(0.3f, 0.3f);
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    // Regained audio focus, resume playback
+                    songs.resumeMediaPlayer();
+                    break;
+            }
+        }
+    };
+
+    public void setUp(MediaPlayer player) {
+        playing.setSongs(songs);
+        songs.tracks = Utils.getTracks(this);
+        songs.initialize(Base.this);
+
+        Songs.Adapter.Listener listener = new Songs.Adapter.Listener() {
+
+            @Override
+            public void onClick(View view, int position) {
+                if(position < 0) return;
+                songs.setPlaying(playing);
+                songs.adapter.setSelectedPosition(position);
+                ArrayList<Audio> tracks = Utils.getTracks(Base.this);
+                playing.initialize(position, tracks);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                options.setVisibility(View.VISIBLE);
+            }
+
+        };
+        Search.SearchList.Adapter.Listener search_listner = new Search.SearchList.Adapter.Listener() {
+
+            @Override
+            public void onClick(View view, int position) {
+                if(position < 0) return;
+                searches.searchlist.adapter.setSelectedPosition(position);
+                searches.setPlaying(playing);
+
+                ArrayList<Audio> tracks = searches.getSearchedTracks();
+                playing.initialize(position, tracks);
+
+            }
+        };
+
+        playing.setHandler(new Handler(Looper.getMainLooper()));
+        songs.setNow_playing(playing.dropper);
+
+        searches.setTracks(Utils.getTracks(Base.this));
+        searches.initialize(Base.this);
+        playlists.getAdd_songs().addlist.setTracks(Utils.getTracks(Base.this));
+        playlists.getAdd_songs().addlist.initialize(Base.this);
+        playlists.setOptions(options);
+
+        favourites.setTracks(songs.tracks);
+        playlists.getPlaylists().playlists = new ArrayList<>();
+        playlists.getPlaylists().initialize(Base.this);
+        playlists.getPlaylists().playlists.add(songs.recentlyAdded(Base.this));
+        playlists.getPlaylist_tracks().contents.setPlayer(player);
+        favourites.initialize(Base.this);
+
+        songs.adapter.setClickListener(listener);
+        searches.searchlist.adapter.setClickListener(search_listner);
+    }
+
+    public void deSelect(View current) {
+        if(playing.is_playing) {
+
+        }
+    }
     @Override
     protected void getInitialization() {
-
-        if(checkPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-        }else {
-            requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-
+        player = new MediaPlayer();
         Intent intent = getIntent();
         runner = (Runner) intent.getSerializableExtra("runner");
 
@@ -114,59 +198,49 @@ public class Base extends Beats {
 
     }
 
-
     @Override
     protected void getAdjustments() {
         super.getAdjustments();
+        tab.post(new Runnable() {
+            @Override
+            public void run() {
+                Utils.debug("tab.post: ");
+                playing.post(tab.getHeight(), tab);
+            }
+        });
     }
 
     @Override
     protected void getActionAttachments() {
         super.getActionAttachments();
 
-        MediaPlayer player = new MediaPlayer();
-
-        songs.setActivity(this);
+        songs.setActivity(Base.this);
+        playing.setHandler(new Handler(Looper.getMainLooper()));
         playing.dropper.setPlayer(player);
         playing.setPlayer(player);
-        songs.setNow_playing(playing.dropper);
-        songs.setPlaying(playing);
-        songs.initialize(this);
-        searches.initialize(Base.this, songs.tracks);
-        playlists.getAdd_songs().addlist.setTracks(songs.tracks);
-        playlists.getAdd_songs().addlist.initialize(this);
-        playlists.setOptions(options);
-
         searches.searchlist.setPlayer(player);
         favourites.setPlayer(player);
         songs.setPlayer(player);
 
-        searches.setTracks(songs.tracks);
-        favourites.setTracks(songs.tracks);
-        playlists.getPlaylists().playlists = new ArrayList<>();
-        playlists.getPlaylists().initialize(this);
-        playlists.getPlaylists().playlists.add(songs.recentlyAdded(Base.this));
-        playlists.getPlaylist_tracks().contents.setPlayer(player);
-        favourites.initialize(Base.this);
+        ViewTreeObserver.OnGlobalLayoutListener observer = new ViewTreeObserver.OnGlobalLayoutListener() {
 
-        content.getViewTreeObserver().addOnGlobalLayoutListener(
+            @Override
+            public void onGlobalLayout() {
 
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
+                Rect rect = new Rect();
+                content.getWindowVisibleDisplayFrame(rect);
+                int screenHeight = content.getRootView().getHeight();
+                int keypadHeight = screenHeight - rect.bottom;
 
-                        Rect rect = new Rect();
-                        content.getWindowVisibleDisplayFrame(rect);
-                        int screenHeight = content.getRootView().getHeight();
-                        int keypadHeight = screenHeight - rect.bottom;
+                if (keypadHeight > screenHeight * 0.15) {
+                    tab.setVisibility(View.GONE);
+                } else {
+                    tab.setVisibility(View.VISIBLE);
+                }
+            }
+        };
 
-                        if (keypadHeight > screenHeight * 0.15) {
-                            tab.setVisibility(View.GONE);
-                        } else {
-                            tab.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
+        content.getViewTreeObserver().addOnGlobalLayoutListener(observer);
 
         int grey = getResources().getColor(R.color.grey1);
         int app_color = getResources().getColor(R.color.beat_color);
@@ -272,43 +346,58 @@ public class Base extends Beats {
             }
 
         });
-    }
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_base);
-        super.onCreate(savedInstanceState);
+        if (Utils.checkPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                Utils.checkPermission(this, Manifest.permission.READ_MEDIA_AUDIO)) {
+            setUp(player);
+        } else {
+            Utils.requestPermission(this);
+        }
     }
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        tab.post(new Runnable() {
+        manager = (AudioManager)  this.getSystemService(Context.AUDIO_SERVICE);
+        int result = manager.requestAudioFocus(audio_listener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+
+        if ((player.isPlaying()) && (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)) {
+            player.start();
+        }
+
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
             @Override
-            public void run() {
-                Utils.debug("tab.post: ");
-                playing.post(tab.getHeight(), tab);
+            public void onCompletion(MediaPlayer player) {
+                playing.stopUpdatingTime();
+                switch (songs.mode) {
+                    case Songs.Mode.repeat_current: {
+                        playing.repeatCurrent();
+                    }break;
+                    case Songs.Mode.repeat_all: {
+                        playing.repeatAll();
+                    }break;
+                    case Songs.Mode.shuffle: {
+                        playing.shuffle();
+                    }break;
+                    case Songs.Mode.all: {
+                        playing.playNext();
+                    }break;
+                }
             }
         });
     }
 
-    public  boolean checkPermission(Beats beats, String permission) {
-        int result = ContextCompat.checkSelfPermission(beats, permission);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            return false;
-        }
-
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_base);
+        getInitialization();
+        getIdentification();
+        getAdjustments();
+        getActionAttachments();
     }
-
-    public  void requestPermission(Beats beats, String granted_permission) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            ActivityCompat.requestPermissions(beats,  new String[]{granted_permission}, 101);
-
-        }
-    }
-
 }

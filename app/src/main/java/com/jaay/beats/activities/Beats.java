@@ -12,12 +12,14 @@ package com.jaay.beats.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.jaay.beats.R;
+import com.jaay.beats.tools.Utils;
 
 public class Beats extends AppCompatActivity {
 
@@ -35,11 +37,6 @@ public class Beats extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setNavigationBarColor(beat_color);
-
-        getInitialization();
-        getIdentification();
-        getAdjustments();
-        getActionAttachments();
     }
 
     protected void getIdentification(){

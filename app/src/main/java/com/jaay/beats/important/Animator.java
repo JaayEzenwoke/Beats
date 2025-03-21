@@ -125,7 +125,6 @@ public abstract class Animator implements Choreographer.FrameCallback {
     }
 
     public void evaluate(float current_time) {
-        Utils.debug("evaluators: " + evaluators.length);
         Handler handler = new Handler(Looper.getMainLooper());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
